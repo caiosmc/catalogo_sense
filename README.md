@@ -1,4 +1,4 @@
-# Catálogo XBZ
+# Catálogo Sense
 
 Catálogo de produtos simples e moderno para compartilhamento online.
 
