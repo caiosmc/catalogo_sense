@@ -31,7 +31,7 @@ function App() {
           <h2>{categoria}</h2>
           <div style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+            gridTemplateColumns: "repeat(2, 1fr)",
             gap: 20
           }}>
             {filtrados.filter(p => p.categoria === categoria).map((p, i) => (
