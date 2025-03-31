@@ -19,7 +19,7 @@ function App() {
 
   return (
     <div style={{ padding: 20, fontFamily: "Arial, sans-serif" }}>
-      <h1 style={{ textAlign: "center" }}>Catálogo de Produtos</h1>
+      <h1 style={{ textAlign: "center" }}>Catálogo Sense</h1>
       <input
         placeholder="Buscar por nome..."
         value={filtro}
