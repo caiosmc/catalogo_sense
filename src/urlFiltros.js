@@ -1,16 +1,15 @@
-export function atualizarCategoriasNaURL(categorias) {
+export function obterTermoBuscaDaURL() {
   const params = new URLSearchParams(window.location.search);
-  if (categorias.length > 0) {
-    params.set("categorias", categorias.join(","));
+  return params.get("busca") || "";
+}
+
+export function atualizarTermoBuscaNaURL(termo) {
+  const params = new URLSearchParams(window.location.search);
+  if (termo) {
+    params.set("busca", termo);
   } else {
-    params.delete("categorias");
+    params.delete("busca");
   }
   const novaUrl = `${window.location.pathname}?${params.toString()}`;
   window.history.replaceState({}, "", novaUrl);
-}
-
-export function obterCategoriasDaURL() {
-  const params = new URLSearchParams(window.location.search);
-  const raw = params.get("categorias");
-  return raw ? raw.split(",") : [];
 }
