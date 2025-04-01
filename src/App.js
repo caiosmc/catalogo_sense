@@ -5,12 +5,12 @@ function App() {
   const [filtro, setFiltro] = useState("");
   const [categoriasSelecionadas, setCategoriasSelecionadas] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
-  const [sliderIndex, setSliderIndex] = useState({});
 
   useEffect(() => {
     fetch("/produtos.json")
       .then((res) => res.json())
-      .then((data) => setProdutos(data));
+      .then((data) => setProdutos(data))
+      .catch((err) => console.error("Erro ao carregar produtos:", err));
 
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
@@ -22,9 +22,7 @@ function App() {
 
   const toggleCategoria = (cat) => {
     setCategoriasSelecionadas((prev) =>
-      prev.includes(cat)
-        ? prev.filter((c) => c !== cat)
-        : [...prev, cat]
+      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
     );
   };
 
@@ -41,21 +39,42 @@ function App() {
     return matchNome && matchCategoria;
   });
 
-  const agrupadosPorCategoria = categoriasSelecionadas.length > 0 ? categoriasSelecionadas : categorias;
+  const agrupadosPorCategoria =
+    categoriasSelecionadas.length > 0 ? categoriasSelecionadas : categorias;
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", fontFamily: "Arial, sans-serif", color: "#4d4d4d" }}>
-      {/* Sidebar */}
+    <div
+      style={{
+        display: "flex",
+        minHeight: "100vh",
+        fontFamily: "Arial, sans-serif",
+        color: "#4d4d4d",
+      }}
+    >
       {!isMobile && (
-        <aside style={{ width: 200, padding: 20, borderRight: "1px solid #ddd" }}>
-          <h2 style={{ fontSize: 20, color: "#4d4d4d", marginBottom: 10, textDecoration: "underline" }}>Categorias</h2>
-          <button onClick={limparCategorias} style={{ marginBottom: 10, padding: 6, fontSize: 12 }}>Limpar filtros</button>
+        <aside style={{ width: 180, padding: 20, borderRight: "1px solid #ddd" }}>
+          <h2
+            style={{
+              fontSize: 18,
+              color: "#4d4d4d",
+              marginBottom: 10,
+              textDecoration: "underline",
+            }}
+          >
+            Categorias
+          </h2>
+          <button
+            onClick={limparCategorias}
+            style={{ marginBottom: 10, padding: 6, fontSize: 12 }}
+          >
+            Limpar filtros
+          </button>
           <ul style={{ listStyle: "none", padding: 0 }}>
             {categorias.map((cat, idx) => (
               <li key={idx}>
-                <label style={{ display: "block", fontSize: 14, color: "#4d4d4d" }}>
+                <label style={{ display: "block", fontSize: 14 }}>
                   <input
                     type="checkbox"
                     checked={categoriasSelecionadas.includes(cat)}
@@ -70,20 +89,25 @@ function App() {
         </aside>
       )}
 
-      {/* Main Content */}
       <main style={{ flex: 1, padding: 20 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <h1 style={{ fontSize: 32, color: "#4d4d4d" }}>Catálogo Sense</h1>
-          <img src="/logo-rg.png" alt="Logo" style={{ width: isMobile ? 80 : 100 }} />
+          <img
+            src="/logo-rg.png"
+            alt="Logo"
+            style={{ width: isMobile ? 80 : 100 }}
+          />
         </div>
 
         {isMobile && (
           <div style={{ margin: "20px 0" }}>
-            <label style={{ color: "#4d4d4d", fontSize: 16 }}>Filtre a categoria desejada</label>
+            <label style={{ color: "#4d4d4d", fontSize: 16 }}>
+              Filtre a categoria desejada
+            </label>
             <ul style={{ listStyle: "none", padding: 0 }}>
               {categorias.map((cat, idx) => (
                 <li key={idx}>
-                  <label style={{ display: "block", fontSize: 14, color: "#4d4d4d" }}>
+                  <label style={{ display: "block", fontSize: 14 }}>
                     <input
                       type="checkbox"
                       checked={categoriasSelecionadas.includes(cat)}
@@ -95,7 +119,12 @@ function App() {
                 </li>
               ))}
               <li>
-                <button onClick={limparCategorias} style={{ marginTop: 10, padding: 6, fontSize: 12 }}>Limpar filtros</button>
+                <button
+                  onClick={limparCategorias}
+                  style={{ marginTop: 10, padding: 6, fontSize: 12 }}
+                >
+                  Limpar filtros
+                </button>
               </li>
             </ul>
           </div>
@@ -113,7 +142,6 @@ function App() {
             display: "block",
             marginLeft: "auto",
             marginRight: "auto",
-            color: "#4d4d4d"
           }}
           value={filtro}
           onChange={(e) => setFiltro(e.target.value)}
@@ -129,29 +157,30 @@ function App() {
                 gap: 20,
               }}
             >
-              {produtosFiltrados.filter((p) => p.categoria === cat).map((p, pidx) => (
-                <div
-                  key={pidx}
-                  style={{
-                    border: "1px solid #ddd",
-                    borderRadius: 10,
-                    overflow: "hidden",
-                    background: "#fff",
-                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
-                    color: "#4d4d4d"
-                  }}
-                >
-                  <img
-                    src={p.imagem_d1}
-                    alt={p.nome}
-                    style={{ width: "100%", height: 150, objectFit: "cover" }}
-                  />
-                  <div style={{ padding: 12 }}>
-                    <h3 style={{ fontSize: 16, fontWeight: "bold", color: "#4d4d4d" }}>{p.nome}</h3>
-                    <p style={{ fontSize: 14, color: "#4d4d4d" }}>Ref: {p.referencia}</p>
+              {produtosFiltrados
+                .filter((p) => p.categoria === cat)
+                .map((p, pidx) => (
+                  <div
+                    key={pidx}
+                    style={{
+                      border: "1px solid #ddd",
+                      borderRadius: 10,
+                      overflow: "hidden",
+                      background: "#fff",
+                      boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
+                    }}
+                  >
+                    <img
+                      src={p.imagem_d1}
+                      alt={p.nome}
+                      style={{ width: "100%", height: 150, objectFit: "cover" }}
+                    />
+                    <div style={{ padding: 12 }}>
+                      <h3 style={{ fontSize: 16, fontWeight: "bold" }}>{p.nome}</h3>
+                      <p style={{ fontSize: 14 }}>Ref: {p.referencia}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
         ))}
