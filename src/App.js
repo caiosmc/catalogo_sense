@@ -75,7 +75,6 @@ function App() {
         minHeight: "100vh",
       }}
     >
-      {/* CATEGORIAS DESKTOP */}
       {!isMobile && (
         <aside
           style={{
@@ -129,7 +128,6 @@ function App() {
         </aside>
       )}
 
-      {/* CONTEÚDO PRINCIPAL */}
       <main style={{ flex: 1, padding: 20, background: cores.cinzaClaro }}>
         <div
           style={{
@@ -149,12 +147,9 @@ function App() {
           >
             Catálogo Sense
           </h1>
-          {!isMobile && (
-            <img src="/logo-rg.png" alt="Logo RG" style={{ height: 70 }} />
-          )}
+          <img src="/logo-rg.png" alt="Logo RG" style={{ height: 70 }} />
         </div>
 
-        {/* MOBILE: MENU CATEGORIAS EXPANDÍVEL */}
         {isMobile && (
           <div style={{ marginBottom: 16 }}>
             <button
@@ -173,6 +168,16 @@ function App() {
             </button>
             {mostrarCategoriasMobile && (
               <div>
+                <h2
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 600,
+                    color: cores.cinza,
+                    marginBottom: 10,
+                  }}
+                >
+                  Categorias
+                </h2>
                 <button
                   onClick={limparCategorias}
                   style={{
@@ -204,7 +209,6 @@ function App() {
           </div>
         )}
 
-        {/* BARRA DE BUSCA */}
         <input
           placeholder="Buscar por nome do produto..."
           style={{
@@ -221,7 +225,6 @@ function App() {
           onChange={(e) => setFiltro(e.target.value)}
         />
 
-        {/* LISTAGEM DE PRODUTOS */}
         <div
           style={{
             display: "grid",
