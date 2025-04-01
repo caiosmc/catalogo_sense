@@ -5,6 +5,7 @@ function App() {
   const [filtro, setFiltro] = useState("");
   const [categoriaSelecionada, setCategoriaSelecionada] = useState("Todos os produtos");
   const [isMobile, setIsMobile] = useState(false);
+  const [sliderIndex, setSliderIndex] = useState({});
 
   useEffect(() => {
     fetch("/produtos.json")
@@ -28,16 +29,22 @@ function App() {
     return matchNome && matchCategoria;
   });
 
+  const handleNext = (ref) => {
+    setSliderIndex((prev) => ({
+      ...prev,
+      [ref]: (prev[ref] || 0) + 1 > 2 ? 0 : (prev[ref] || 0) + 1
+    }));
+  };
+
+  const handlePrev = (ref) => {
+    setSliderIndex((prev) => ({
+      ...prev,
+      [ref]: (prev[ref] || 0) - 1 < 0 ? 2 : (prev[ref] || 0) - 1
+    }));
+  };
+
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: isMobile ? "column" : "row",
-        minHeight: "100vh",
-        fontFamily: "Arial, sans-serif",
-      }}
-    >
-      {/* Menu lateral no desktop */}
+    <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", minHeight: "100vh", fontFamily: "Arial, sans-serif" }}>
       {!isMobile && (
         <aside style={{ width: 240, padding: 20, borderRight: "1px solid #ddd" }}>
           <h2 style={{ fontSize: 20, fontWeight: "bold", marginBottom: 10 }}>Categorias</h2>
@@ -65,11 +72,9 @@ function App() {
         </aside>
       )}
 
-      {/* Conteúdo principal */}
       <main style={{ flex: 1, padding: 20 }}>
         <h1 style={{ fontSize: 28, textAlign: "center", marginBottom: 20 }}>Catálogo Sense</h1>
 
-        {/* Dropdown no mobile */}
         {isMobile && (
           <div style={{ paddingBottom: 20 }}>
             <label style={{ fontWeight: "bold" }}>Filtre a categoria desejada:</label>
@@ -85,7 +90,6 @@ function App() {
           </div>
         )}
 
-        {/* Campo de busca centralizado */}
         <div style={{ display: "flex", justifyContent: "center" }}>
           <input
             placeholder="Buscar por nome do produto..."
@@ -103,35 +107,65 @@ function App() {
           />
         </div>
 
-        {/* Grid responsivo */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(auto-fill, minmax(200px, 1fr))",
-            gap: 20,
-          }}
-        >
-          {produtosFiltrados.map((p, idx) => (
-            <div
-              key={idx}
-              style={{
-                border: "1px solid #ddd",
-                borderRadius: 10,
-                overflow: "hidden",
-                background: "#fff",
-              }}
-            >
-              <img
-                src={p.imagem_d1}
-                alt={p.nome}
-                style={{ width: "100%", height: 150, objectFit: "cover" }}
-              />
-              <div style={{ padding: 12 }}>
-                <h3 style={{ fontSize: 16, fontWeight: "bold" }}>{p.nome}</h3>
-                <p style={{ fontSize: 14, color: "#555" }}>Ref: {p.referencia}</p>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(auto-fill, minmax(200px, 1fr))",
+          gap: 20
+        }}>
+          {produtosFiltrados.map((p, idx) => {
+            const imagens = [p.imagem_d1, p.imagem_d2, p.imagem_d3].filter(Boolean);
+            const imgIndex = sliderIndex[p.referencia] || 0;
+
+            return (
+              <div key={idx} style={{ border: "1px solid #ddd", borderRadius: 10, overflow: "hidden", background: "#fff", position: "relative" }}>
+                <img
+                  src={imagens[imgIndex]}
+                  alt={p.nome}
+                  style={{ width: "100%", height: 150, objectFit: "cover" }}
+                />
+                {imagens.length > 1 && (
+                  <>
+                    <button
+                      onClick={() => handlePrev(p.referencia)}
+                      style={{
+                        position: "absolute",
+                        top: "50%",
+                        left: 5,
+                        transform: "translateY(-50%)",
+                        background: "#fff",
+                        border: "1px solid #ccc",
+                        borderRadius: "50%",
+                        width: 24,
+                        height: 24,
+                        fontSize: 14,
+                        cursor: "pointer"
+                      }}
+                    >‹</button>
+                    <button
+                      onClick={() => handleNext(p.referencia)}
+                      style={{
+                        position: "absolute",
+                        top: "50%",
+                        right: 5,
+                        transform: "translateY(-50%)",
+                        background: "#fff",
+                        border: "1px solid #ccc",
+                        borderRadius: "50%",
+                        width: 24,
+                        height: 24,
+                        fontSize: 14,
+                        cursor: "pointer"
+                      }}
+                    >›</button>
+                  </>
+                )}
+                <div style={{ padding: 12 }}>
+                  <h3 style={{ fontSize: 16, fontWeight: "bold" }}>{p.nome}</h3>
+                  <p style={{ fontSize: 14, color: "#555" }}>Ref: {p.referencia}</p>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </main>
     </div>
