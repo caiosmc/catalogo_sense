@@ -47,7 +47,19 @@ function App() {
 
       {!isMobile && (
         <aside style={{ width: 180, padding: 20, borderRight: "1px solid #ddd", background: cores.cinzaClaro }}>
-          <h2 style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10, color: cores.cinza }}>Categorias</h2>
+          <h2
+            style={{
+              fontSize: 18,
+              fontWeight: 600,
+              marginBottom: 16,
+              color: cores.cinza,
+              borderBottom: `2px solid ${cores.laranja}`,
+              paddingBottom: 6,
+              letterSpacing: 0.5
+            }}
+          >
+            Categorias
+          </h2>
           <ul style={{ listStyle: "none", padding: 0 }}>
             {categorias.map((cat, idx) => (
               <li key={idx} style={{ marginBottom: 8 }}>
