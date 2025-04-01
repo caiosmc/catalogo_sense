@@ -75,7 +75,7 @@ function App() {
 
       <main style={{ flex: 1, padding: 20, background: cores.cinzaClaro }}>
         <div style={{ textAlign: "center", marginBottom: 20 }}>
-          <img src="/logo RG.png" alt="Logo RG" style={{ height: 50, marginBottom: 10 }} />
+          <img src="/logo-rg.png" alt="Logo RG" style={{ height: 50, marginBottom: 10 }} />
           <h1 style={{ fontSize: 26, color: cores.cinza }}>Catálogo Sense</h1>
         </div>
 
