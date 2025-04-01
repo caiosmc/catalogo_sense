@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  obterCategoriasDaURL,
-  atualizarURLComCategorias,
-  obterBuscaDaURL,
-  atualizarURLComBusca,
-} from "./utils/urlFiltros";
+import { obterCategoriasDaURL, atualizarParametrosURL } from "./utils/urlFiltros";
 
 function App() {
   const [produtos, setProdutos] = useState([]);
@@ -27,34 +22,19 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const categoriasNaURL = obterCategoriasDaURL();
-    const buscaNaURL = obterBuscaDaURL();
+    const params = new URLSearchParams(window.location.search);
+    const filtroInicial = params.get("busca") || "";
+    setFiltro(filtroInicial);
 
-    if (categoriasNaURL.length) setCategoriasSelecionadas(categoriasNaURL);
-    if (buscaNaURL) setFiltro(buscaNaURL);
-
+    const categoriasDaURL = obterCategoriasDaURL();
+    setCategoriasSelecionadas(categoriasDaURL);
   }, []);
 
   useEffect(() => {
-    atualizarURLComCategorias(categoriasSelecionadas);
-  }, [categoriasSelecionadas]);
-
-  useEffect(() => {
-    atualizarURLComBusca(filtro);
-  }, [filtro]);
+    atualizarParametrosURL(filtro, categoriasSelecionadas);
+  }, [filtro, categoriasSelecionadas]);
 
   const categorias = [...new Set(produtos.map((p) => p.categoria))];
-
-  const toggleCategoria = (cat) => {
-    setCategoriasSelecionadas((prev) =>
-      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
-    );
-  };
-
-  const limparCategorias = () => {
-    setCategoriasSelecionadas([]);
-    setFiltro("");
-  };
 
   const produtosFiltrados = produtos.filter((p) => {
     const matchNome = p.nome.toLowerCase().includes(filtro.toLowerCase());
@@ -64,11 +44,44 @@ function App() {
     return matchNome && matchCategoria;
   });
 
-  const agrupadosPorCategoria =
-    categoriasSelecionadas.length > 0 ? categoriasSelecionadas : categorias;
+  const contagemPorCategoria = categorias.reduce((acc, cat) => {
+    acc[cat] = produtosFiltrados.filter((p) => p.categoria === cat).length;
+    return acc;
+  }, {});
 
-  const scrollToTop = () =>
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  const totalSelecionado = Object.values(contagemPorCategoria).reduce(
+    (a, b) => a + b,
+    0
+  );
+
+  const agrupadosPorCategoria = (categoriasSelecionadas.length > 0
+    ? categoriasSelecionadas
+    : categorias
+  ).filter((cat) => contagemPorCategoria[cat] > 0);
+
+  const toggleCategoria = (cat) => {
+    if (cat === "Selecionar tudo") {
+      if (categoriasSelecionadas.length === categorias.length) {
+        setCategoriasSelecionadas([]);
+      } else {
+        setCategoriasSelecionadas(categorias);
+      }
+      return;
+    }
+    setCategoriasSelecionadas((prev) => {
+      const novas = prev.includes(cat)
+        ? prev.filter((c) => c !== cat)
+        : [...prev, cat];
+      return novas;
+    });
+  };
+
+  const limparCategorias = () => {
+    setCategoriasSelecionadas([]);
+    setFiltro("");
+  };
+
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   const renderImagens = (p, pidx) => {
     const imagens = [p.imagem_d1, p.imagem_d2, p.imagem_d3].filter(Boolean);
@@ -150,23 +163,29 @@ function App() {
             <h2 style={{ fontSize: 18, color: "#4d4d4d", marginBottom: 4 }}>Categorias</h2>
             <div style={{ height: 4, backgroundColor: "#f57c00", width: 40, marginBottom: 10 }}></div>
           </div>
-          <button
-            onClick={limparCategorias}
-            style={{ backgroundColor: "#f57c00", color: "#fff", marginBottom: 10, padding: 6, fontSize: 12, border: "none", borderRadius: 4 }}
-          >
-            Limpar filtros
-          </button>
+          <button onClick={limparCategorias} style={{ backgroundColor: "#f57c00", color: "#fff", marginBottom: 10, padding: 6, fontSize: 12, border: "none", borderRadius: 4 }}>Limpar filtros</button>
           <ul style={{ listStyle: "none", padding: 0 }}>
+            <li>
+              <label style={{ display: "block", fontSize: 11, color: "#4d4d4d" }}>
+                <input
+                  type="checkbox"
+                  checked={categoriasSelecionadas.length === categorias.length}
+                  onChange={() => toggleCategoria("Selecionar tudo")}
+                  style={{ marginRight: 8 }}
+                />
+                Selecionar tudo ({totalSelecionado})
+              </label>
+            </li>
             {categorias.map((cat, idx) => (
               <li key={idx}>
-                <label style={{ display: "block", fontSize: 12, color: "#4d4d4d" }}>
+                <label style={{ display: "block", fontSize: 11, color: "#4d4d4d" }}>
                   <input
                     type="checkbox"
                     checked={categoriasSelecionadas.includes(cat)}
                     onChange={() => toggleCategoria(cat)}
                     style={{ marginRight: 8 }}
                   />
-                  {cat}
+                  {cat} ({contagemPorCategoria[cat] || 0})
                 </label>
               </li>
             ))}
@@ -182,37 +201,6 @@ function App() {
           </h1>
           <img src="/logo-rg.png" alt="Logo" style={{ width: isMobile ? 80 : 100 }} />
         </div>
-
-        {isMobile && (
-          <div style={{ margin: "20px 0" }}>
-            <h2 style={{ color: "#4d4d4d", fontSize: 16, marginBottom: 10 }}>Filtre as Categorias</h2>
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              <button onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)} style={estiloBotaoMobile}>
-                {mostrarCategoriasMobile ? "Ocultar categorias" : "Mostrar categorias"}
-              </button>
-              {mostrarCategoriasMobile && (
-                <button onClick={limparCategorias} style={estiloBotaoMobile}>Limpar filtros</button>
-              )}
-            </div>
-            {mostrarCategoriasMobile && (
-              <ul style={{ listStyle: "none", padding: 0, marginTop: 10 }}>
-                {categorias.map((cat, idx) => (
-                  <li key={idx}>
-                    <label style={{ display: "block", fontSize: 14, color: "#4d4d4d" }}>
-                      <input
-                        type="checkbox"
-                        checked={categoriasSelecionadas.includes(cat)}
-                        onChange={() => toggleCategoria(cat)}
-                        style={{ marginRight: 8 }}
-                      />
-                      {cat}
-                    </label>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        )}
 
         <input
           placeholder="Buscar por nome do produto..."
@@ -234,7 +222,7 @@ function App() {
 
         {agrupadosPorCategoria.map((cat, idx) => (
           <div key={idx}>
-            <h2 style={{ color: "#4d4d4d", fontSize: 22, marginTop: 40 }}>{cat}</h2>
+            <h2 style={{ color: "#4d4d4d", fontSize: 22, marginTop: 40 }}>{cat} | {contagemPorCategoria[cat]}</h2>
             <div
               style={{
                 display: "grid",
