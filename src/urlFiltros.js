@@ -1,15 +1,32 @@
-export function obterTermoBuscaDaURL() {
+// src/utils/urlFiltros.js
+
+export function obterCategoriasDaURL() {
+  const params = new URLSearchParams(window.location.search);
+  const categorias = params.get("categorias");
+  return categorias ? categorias.split(",") : [];
+}
+
+export function atualizarURLComCategorias(categorias) {
+  const params = new URLSearchParams(window.location.search);
+  if (categorias.length > 0) {
+    params.set("categorias", categorias.join(","));
+  } else {
+    params.delete("categorias");
+  }
+  window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}`);
+}
+
+export function obterBuscaDaURL() {
   const params = new URLSearchParams(window.location.search);
   return params.get("busca") || "";
 }
 
-export function atualizarTermoBuscaNaURL(termo) {
+export function atualizarURLComBusca(busca) {
   const params = new URLSearchParams(window.location.search);
-  if (termo) {
-    params.set("busca", termo);
+  if (busca) {
+    params.set("busca", busca);
   } else {
     params.delete("busca");
   }
-  const novaUrl = `${window.location.pathname}?${params.toString()}`;
-  window.history.replaceState({}, "", novaUrl);
+  window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}`);
 }
