@@ -77,6 +77,21 @@ function App() {
               </li>
             ))}
           </ul>
+          <button
+            onClick={limparCategorias}
+            style={{
+              background: cores.laranja,
+              color: cores.branco,
+              border: "none",
+              borderRadius: 6,
+              padding: "8px 12px",
+              cursor: "pointer",
+              fontWeight: 500,
+              width: "100%"
+            }}
+          >
+            Limpar filtros
+          </button>
         </aside>
       )}
 
@@ -102,25 +117,24 @@ function App() {
                 <option key={idx} value={cat}>{cat}</option>
               ))}
             </select>
+            <div style={{ display: "flex", justifyContent: "center", marginTop: 10 }}>
+              <button
+                onClick={limparCategorias}
+                style={{
+                  background: cores.laranja,
+                  color: cores.branco,
+                  border: "none",
+                  borderRadius: 6,
+                  padding: "8px 12px",
+                  cursor: "pointer",
+                  fontWeight: 500
+                }}
+              >
+                Limpar filtros
+              </button>
+            </div>
           </div>
         )}
-
-        <div style={{ display: "flex", justifyContent: isMobile ? "center" : "flex-end", marginBottom: 20 }}>
-          <button
-            onClick={limparCategorias}
-            style={{
-              background: cores.laranja,
-              color: cores.branco,
-              border: "none",
-              borderRadius: 6,
-              padding: "8px 12px",
-              cursor: "pointer",
-              fontWeight: 500
-            }}
-          >
-            Limpar filtros
-          </button>
-        </div>
 
         <div style={{ display: "flex", justifyContent: "center" }}>
           <input
