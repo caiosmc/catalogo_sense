@@ -1,25 +1,16 @@
-export function getFiltersFromURL() {
-  if (typeof window === "undefined") return {};
-
+export function atualizarCategoriasNaURL(categorias) {
   const params = new URLSearchParams(window.location.search);
-  const filters = {};
-
-  for (const [key, value] of params.entries()) {
-    filters[key] = value;
+  if (categorias.length > 0) {
+    params.set("categorias", categorias.join(","));
+  } else {
+    params.delete("categorias");
   }
-
-  return filters;
+  const novaUrl = `${window.location.pathname}?${params.toString()}`;
+  window.history.replaceState({}, "", novaUrl);
 }
 
-export function setFiltersToURL(filters) {
-  if (typeof window === "undefined") return;
-
-  const params = new URLSearchParams();
-
-  Object.entries(filters).forEach(([key, value]) => {
-    if (value) params.set(key, value);
-  });
-
-  const newURL = `${window.location.pathname}?${params.toString()}`;
-  window.history.replaceState(null, "", newURL);
+export function obterCategoriasDaURL() {
+  const params = new URLSearchParams(window.location.search);
+  const raw = params.get("categorias");
+  return raw ? raw.split(",") : [];
 }
