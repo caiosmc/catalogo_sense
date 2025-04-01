@@ -37,21 +37,8 @@ function App() {
         fontFamily: "Arial, sans-serif",
       }}
     >
-      {/* Menu responsivo */}
-      {isMobile ? (
-        <div style={{ padding: 20 }}>
-          <label style={{ fontWeight: "bold" }}>Categorias:</label>
-          <select
-            style={{ width: "100%", padding: 10, marginTop: 10 }}
-            value={categoriaSelecionada}
-            onChange={(e) => setCategoriaSelecionada(e.target.value)}
-          >
-            {categorias.map((cat, idx) => (
-              <option key={idx} value={cat}>{cat}</option>
-            ))}
-          </select>
-        </div>
-      ) : (
+      {/* Menu lateral no desktop */}
+      {!isMobile && (
         <aside style={{ width: 240, padding: 20, borderRight: "1px solid #ddd" }}>
           <h2 style={{ fontSize: 20, fontWeight: "bold", marginBottom: 10 }}>Categorias</h2>
           <ul style={{ listStyle: "none", padding: 0 }}>
@@ -82,24 +69,45 @@ function App() {
       <main style={{ flex: 1, padding: 20 }}>
         <h1 style={{ fontSize: 28, textAlign: "center", marginBottom: 20 }}>Catálogo Sense</h1>
 
-        <input
-          placeholder="Buscar por nome do produto..."
-          style={{
-            width: "100%",
-            maxWidth: 400,
-            padding: 10,
-            borderRadius: 6,
-            border: "1px solid #ccc",
-            marginBottom: 30,
-          }}
-          value={filtro}
-          onChange={(e) => setFiltro(e.target.value)}
-        />
+        {/* Dropdown no mobile */}
+        {isMobile && (
+          <div style={{ paddingBottom: 20 }}>
+            <label style={{ fontWeight: "bold" }}>Filtre a categoria desejada:</label>
+            <select
+              style={{ width: "100%", padding: 10, marginTop: 10 }}
+              value={categoriaSelecionada}
+              onChange={(e) => setCategoriaSelecionada(e.target.value)}
+            >
+              {categorias.map((cat, idx) => (
+                <option key={idx} value={cat}>{cat}</option>
+              ))}
+            </select>
+          </div>
+        )}
 
+        {/* Campo de busca centralizado */}
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <input
+            placeholder="Buscar por nome do produto..."
+            style={{
+              width: "100%",
+              maxWidth: 400,
+              padding: 10,
+              borderRadius: 6,
+              border: "1px solid #ccc",
+              marginBottom: 30,
+              textAlign: "left"
+            }}
+            value={filtro}
+            onChange={(e) => setFiltro(e.target.value)}
+          />
+        </div>
+
+        {/* Grid responsivo */}
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+            gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(auto-fill, minmax(200px, 1fr))",
             gap: 20,
           }}
         >
