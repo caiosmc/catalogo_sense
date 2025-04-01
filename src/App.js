@@ -5,6 +5,7 @@ function App() {
   const [filtro, setFiltro] = useState("");
   const [categoriasSelecionadas, setCategoriasSelecionadas] = useState(["Todos os produtos"]);
   const [isMobile, setIsMobile] = useState(false);
+  const [mostrarCategoriasMobile, setMostrarCategoriasMobile] = useState(false);
   const [sliderIndex, setSliderIndex] = useState({});
 
   useEffect(() => {
@@ -78,7 +79,7 @@ function App() {
       {!isMobile && (
         <aside
           style={{
-            width: 200,
+            width: 180,
             padding: 20,
             borderRight: "1px solid #ddd",
             background: cores.cinzaClaro,
@@ -86,13 +87,10 @@ function App() {
         >
           <h2
             style={{
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: 600,
-              marginBottom: 12,
               color: cores.cinza,
-              borderBottom: `2px solid ${cores.laranja}`,
-              paddingBottom: 6,
-              letterSpacing: 0.5,
+              marginBottom: 10,
             }}
           >
             Categorias
@@ -104,24 +102,24 @@ function App() {
               color: cores.branco,
               border: "none",
               borderRadius: 6,
-              padding: "8px 12px",
+              padding: "6px 10px",
+              fontSize: 14,
               cursor: "pointer",
-              fontWeight: 500,
+              marginBottom: 12,
               width: "100%",
-              marginBottom: 16,
             }}
           >
             Limpar filtros
           </button>
           <ul style={{ listStyle: "none", padding: 0 }}>
             {categorias.map((cat, idx) => (
-              <li key={idx} style={{ marginBottom: 8 }}>
-                <label style={{ color: cores.cinza }}>
+              <li key={idx} style={{ marginBottom: 6 }}>
+                <label style={{ color: cores.cinza, fontSize: 14 }}>
                   <input
                     type="checkbox"
                     checked={categoriasSelecionadas.includes(cat)}
                     onChange={() => toggleCategoria(cat)}
-                    style={{ marginRight: 8 }}
+                    style={{ marginRight: 6 }}
                   />
                   {cat}
                 </label>
@@ -131,9 +129,8 @@ function App() {
         </aside>
       )}
 
-      {/* MAIN */}
+      {/* CONTEÚDO PRINCIPAL */}
       <main style={{ flex: 1, padding: 20, background: cores.cinzaClaro }}>
-        {/* TÍTULO */}
         <div
           style={{
             display: "flex",
@@ -144,66 +141,70 @@ function App() {
         >
           <h1
             style={{
-              fontSize: 36,
-              color: cores.cinza,
+              fontSize: isMobile ? 24 : 34,
               fontWeight: 700,
+              color: cores.cinza,
               margin: 0,
-              padding: "10px 20px",
-              background: cores.branco,
-              borderRadius: 12,
-              boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
             }}
           >
             Catálogo Sense
           </h1>
-          <img src="/logo-rg.png" alt="Logo RG" style={{ height: 70 }} />
+          {!isMobile && (
+            <img src="/logo-rg.png" alt="Logo RG" style={{ height: 70 }} />
+          )}
         </div>
 
-        {/* MOBILE FILTRO */}
+        {/* MOBILE: MENU CATEGORIAS EXPANDÍVEL */}
         {isMobile && (
-          <div style={{ marginBottom: 20 }}>
-            <h2
-              style={{
-                fontSize: 18,
-                fontWeight: 600,
-                color: cores.cinza,
-                marginBottom: 8,
-              }}
-            >
-              Categorias
-            </h2>
+          <div style={{ marginBottom: 16 }}>
             <button
-              onClick={limparCategorias}
+              onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)}
               style={{
                 background: cores.laranja,
                 color: cores.branco,
                 border: "none",
-                borderRadius: 6,
                 padding: "8px 12px",
-                cursor: "pointer",
+                borderRadius: 6,
                 fontWeight: 500,
-                marginBottom: 12,
+                marginBottom: 10,
               }}
             >
-              Limpar filtros
+              {mostrarCategoriasMobile ? "Esconder categorias" : "Filtrar categorias"}
             </button>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-              {categorias.map((cat, idx) => (
-                <label key={idx} style={{ color: cores.cinza }}>
-                  <input
-                    type="checkbox"
-                    checked={categoriasSelecionadas.includes(cat)}
-                    onChange={() => toggleCategoria(cat)}
-                    style={{ marginRight: 6 }}
-                  />
-                  {cat}
-                </label>
-              ))}
-            </div>
+            {mostrarCategoriasMobile && (
+              <div>
+                <button
+                  onClick={limparCategorias}
+                  style={{
+                    marginBottom: 10,
+                    background: cores.cinza,
+                    color: "white",
+                    border: "none",
+                    borderRadius: 6,
+                    padding: "6px 10px",
+                  }}
+                >
+                  Limpar filtros
+                </button>
+                {categorias.map((cat, idx) => (
+                  <div key={idx} style={{ marginBottom: 6 }}>
+                    <label style={{ color: cores.cinza }}>
+                      <input
+                        type="checkbox"
+                        checked={categoriasSelecionadas.includes(cat)}
+                        onChange={() => toggleCategoria(cat)}
+                        style={{ marginRight: 6 }}
+                      />
+                      {cat}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
-        {/* BARRA DE PESQUISA */}
+        {/* BARRA DE BUSCA */}
         <input
           placeholder="Buscar por nome do produto..."
           style={{
@@ -220,11 +221,11 @@ function App() {
           onChange={(e) => setFiltro(e.target.value)}
         />
 
-        {/* GRID DE PRODUTOS */}
+        {/* LISTAGEM DE PRODUTOS */}
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+            gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(auto-fill, minmax(220px, 1fr))",
             gap: 20,
           }}
         >
@@ -246,11 +247,7 @@ function App() {
                     <img
                       src={imagemAtual}
                       alt={p.nome}
-                      style={{
-                        width: "100%",
-                        height: 150,
-                        objectFit: "cover",
-                      }}
+                      style={{ width: "100%", height: 150, objectFit: "cover" }}
                     />
                     <button
                       onClick={() => handlePrev(p.referencia)}
@@ -287,9 +284,7 @@ function App() {
                   </div>
                 )}
                 <div style={{ padding: 12 }}>
-                  <h3 style={{ fontSize: 16, fontWeight: "bold", color: cores.cinza }}>
-                    {p.nome}
-                  </h3>
+                  <h3 style={{ fontSize: 16, fontWeight: "bold", color: cores.cinza }}>{p.nome}</h3>
                   <p style={{ fontSize: 14, color: "#555" }}>Ref: {p.referencia}</p>
                 </div>
               </div>
