@@ -105,6 +105,18 @@ function App() {
     boxShadow: "0 1px 4px rgba(0,0,0,0.3)",
   });
 
+  const estiloBotaoMobile = {
+    backgroundColor: "#f57c00",
+    color: "white",
+    border: "none",
+    borderRadius: 6,
+    padding: "8px 12px",
+    fontSize: 14,
+    cursor: "pointer",
+    boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+    marginBottom: 10
+  };
+
   return (
     <div style={{ display: "flex", minHeight: "100vh", fontFamily: "Arial, sans-serif", color: "#4d4d4d" }}>
       {!isMobile && (
@@ -140,7 +152,7 @@ function App() {
 
         {isMobile && (
           <div style={{ margin: "20px 0" }}>
-            <button onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)} style={{ marginBottom: 10 }}>
+            <button onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)} style={estiloBotaoMobile}>
               {mostrarCategoriasMobile ? "Ocultar categorias" : "Mostrar categorias"}
             </button>
             {mostrarCategoriasMobile && (
@@ -161,7 +173,7 @@ function App() {
                     </li>
                   ))}
                   <li>
-                    <button onClick={limparCategorias} style={{ marginTop: 10, padding: 6, fontSize: 12 }}>Limpar filtros</button>
+                    <button onClick={limparCategorias} style={estiloBotaoMobile}>Limpar filtros</button>
                   </li>
                 </ul>
               </>
