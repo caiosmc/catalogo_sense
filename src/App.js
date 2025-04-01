@@ -152,12 +152,13 @@ function App() {
 
         {isMobile && (
           <div style={{ margin: "20px 0" }}>
+            <h2 style={{ color: "#4d4d4d", fontSize: 16, marginBottom: 10 }}>Filtre as Categorias</h2>
             <button onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)} style={estiloBotaoMobile}>
               {mostrarCategoriasMobile ? "Ocultar categorias" : "Mostrar categorias"}
             </button>
             {mostrarCategoriasMobile && (
               <>
-                <label style={{ color: "#4d4d4d", fontSize: 16 }}>Filtre a categoria desejada</label>
+                <button onClick={limparCategorias} style={estiloBotaoMobile}>Limpar filtros</button>
                 <ul style={{ listStyle: "none", padding: 0 }}>
                   {categorias.map((cat, idx) => (
                     <li key={idx}>
@@ -172,9 +173,6 @@ function App() {
                       </label>
                     </li>
                   ))}
-                  <li>
-                    <button onClick={limparCategorias} style={estiloBotaoMobile}>Limpar filtros</button>
-                  </li>
                 </ul>
               </>
             )}
