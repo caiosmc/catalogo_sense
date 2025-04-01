@@ -6,7 +6,7 @@ function App() {
   const [categoriasSelecionadas, setCategoriasSelecionadas] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
   const [sliderIndex, setSliderIndex] = useState({});
-  const [mostrarCategoriasMobile, setMostrarCategoriasMobile] = useState(true);
+  const [mostrarCategoriasMobile, setMostrarCategoriasMobile] = useState(false);
 
   useEffect(() => {
     fetch("/produtos.json")
@@ -146,7 +146,10 @@ function App() {
 
       <main style={{ flex: 1, padding: 20 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <h1 style={{ fontSize: 32, color: "#4d4d4d" }}>Catálogo Sense</h1>
+          <h1 style={{ fontSize: isMobile ? 32 : 40, color: "#4d4d4d" }}>
+            <span style={{ color: "#4d4d4d" }}>Catálogo </span>
+            <span style={{ color: "#f57c00" }}>Sense</span>
+          </h1>
           <img src="/logo-rg.png" alt="Logo" style={{ width: isMobile ? 80 : 100 }} />
         </div>
 
