@@ -5,6 +5,7 @@ function App() {
   const [filtro, setFiltro] = useState("");
   const [categoriasSelecionadas, setCategoriasSelecionadas] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
+  const [sliderIndex, setSliderIndex] = useState({});
 
   useEffect(() => {
     fetch("/produtos.json")
@@ -39,16 +40,9 @@ function App() {
     return matchNome && matchCategoria;
   });
 
-  const agrupadosPorCategoria =
-    categoriasSelecionadas.length > 0 ? categoriasSelecionadas : categorias;
+  const agrupadosPorCategoria = categoriasSelecionadas.length > 0 ? categoriasSelecionadas : categorias;
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
-
-  const getImagensProduto = (produto) => {
-    return [produto.imagem_d1, produto.imagem_d2, produto.imagem_d3].filter(
-      (img) => img && img !== "NaN"
-    );
-  };
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", fontFamily: "Arial, sans-serif", color: "#4d4d4d" }}>
@@ -132,48 +126,29 @@ function App() {
                 gap: 20,
               }}
             >
-              {produtosFiltrados.filter((p) => p.categoria === cat).map((p, pidx) => {
-                const imagens = getImagensProduto(p);
-                const [currentIndex, setCurrentIndex] = useState(0);
-
-                const nextImage = () => setCurrentIndex((prev) => (prev + 1) % imagens.length);
-                const prevImage = () => setCurrentIndex((prev) => (prev - 1 + imagens.length) % imagens.length);
-
-                return (
-                  <div
-                    key={pidx}
-                    style={{
-                      border: "1px solid #ddd",
-                      borderRadius: 10,
-                      overflow: "hidden",
-                      background: "#fff",
-                      boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
-                      color: "#4d4d4d",
-                      position: "relative"
-                    }}
-                  >
-                    {imagens.length > 1 && (
-                      <>
-                        <button onClick={prevImage} style={{ position: "absolute", left: 5, top: "40%", zIndex: 1 }}>
-                          ◀
-                        </button>
-                        <button onClick={nextImage} style={{ position: "absolute", right: 5, top: "40%", zIndex: 1 }}>
-                          ▶
-                        </button>
-                      </>
-                    )}
-                    <img
-                      src={imagens[currentIndex]}
-                      alt={p.nome}
-                      style={{ width: "100%", height: 150, objectFit: "cover" }}
-                    />
-                    <div style={{ padding: 12 }}>
-                      <h3 style={{ fontSize: 16, fontWeight: "bold", color: "#4d4d4d" }}>{p.nome}</h3>
-                      <p style={{ fontSize: 14, color: "#4d4d4d" }}>Ref: {p.referencia}</p>
-                    </div>
+              {produtosFiltrados.filter((p) => p.categoria === cat).map((p, pidx) => (
+                <div
+                  key={pidx}
+                  style={{
+                    border: "1px solid #ddd",
+                    borderRadius: 10,
+                    overflow: "hidden",
+                    background: "#fff",
+                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
+                    color: "#4d4d4d",
+                  }}
+                >
+                  <img
+                    src={p.imagem_d1}
+                    alt={p.nome}
+                    style={{ width: "100%", height: 150, objectFit: "cover" }}
+                  />
+                  <div style={{ padding: 12 }}>
+                    <h3 style={{ fontSize: 16, fontWeight: "bold", color: "#4d4d4d" }}>{p.nome}</h3>
+                    <p style={{ fontSize: 14, color: "#4d4d4d" }}>Ref: {p.referencia}</p>
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           </div>
         ))}
