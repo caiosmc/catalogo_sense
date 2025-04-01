@@ -46,8 +46,8 @@ function App() {
     <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", fontFamily: "Arial, sans-serif", minHeight: "100vh" }}>
 
       {!isMobile && (
-        <aside style={{ width: 240, padding: 20, borderRight: "1px solid #ddd", background: cores.cinzaClaro }}>
-          <h2 style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>Categorias</h2>
+        <aside style={{ width: 180, padding: 20, borderRight: "1px solid #ddd", background: cores.cinzaClaro }}>
+          <h2 style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10, color: cores.cinza }}>Categorias</h2>
           <ul style={{ listStyle: "none", padding: 0 }}>
             {categorias.map((cat, idx) => (
               <li key={idx} style={{ marginBottom: 8 }}>
@@ -74,9 +74,9 @@ function App() {
       )}
 
       <main style={{ flex: 1, padding: 20, background: cores.cinzaClaro }}>
-        <div style={{ textAlign: "center", marginBottom: 20 }}>
-          <img src="/logo-rg.png" alt="Logo RG" style={{ height: 50, marginBottom: 10 }} />
-          <h1 style={{ fontSize: 26, color: cores.cinza }}>Catálogo Sense</h1>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+          <h1 style={{ fontSize: 32, color: cores.cinza }}>Catálogo Sense</h1>
+          <img src="/logo-rg.png" alt="Logo RG" style={{ height: 70 }} />
         </div>
 
         {isMobile && (
