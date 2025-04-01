@@ -81,7 +81,59 @@ function App() {
         minHeight: "100vh",
       }}
     >
-      {/* aside e header mantidos como antes */}
+      {!isMobile && (
+        <aside
+          style={{
+            width: 180,
+            padding: 20,
+            borderRight: "1px solid #ddd",
+            background: cores.cinzaClaro,
+          }}
+        >
+          <h2
+            style={{
+              fontSize: 16,
+              fontWeight: 600,
+              color: cores.cinza,
+              marginBottom: 10,
+            }}
+          >
+            Categorias
+          </h2>
+          <button
+            onClick={limparCategorias}
+            style={{
+              background: cores.laranja,
+              color: cores.branco,
+              border: "none",
+              borderRadius: 6,
+              padding: "6px 10px",
+              fontSize: 14,
+              cursor: "pointer",
+              marginBottom: 12,
+              width: "100%",
+            }}
+          >
+            Limpar filtros
+          </button>
+          <ul style={{ listStyle: "none", padding: 0 }}>
+            {categorias.map((cat, idx) => (
+              <li key={idx} style={{ marginBottom: 6 }}>
+                <label style={{ color: cores.cinza, fontSize: 14 }}>
+                  <input
+                    type="checkbox"
+                    checked={categoriasSelecionadas.includes(cat)}
+                    onChange={() => toggleCategoria(cat)}
+                    style={{ marginRight: 6 }}
+                  />
+                  {cat}
+                </label>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      )}
+
       <main style={{ flex: 1, padding: 20, background: cores.cinzaClaro }}>
         <div
           style={{
@@ -104,7 +156,64 @@ function App() {
           <img src="/logo-rg.png" alt="Logo RG" style={{ height: 70 }} />
         </div>
 
-        {/* categorias mobile e input de busca mantidos */}
+        {isMobile && (
+          <div style={{ marginBottom: 16 }}>
+            <button
+              onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)}
+              style={{
+                background: cores.laranja,
+                color: cores.branco,
+                border: "none",
+                padding: "8px 12px",
+                borderRadius: 6,
+                fontWeight: 500,
+                marginBottom: 10,
+              }}
+            >
+              {mostrarCategoriasMobile ? "Esconder categorias" : "Filtrar categorias"}
+            </button>
+            {mostrarCategoriasMobile && (
+              <div>
+                <h2
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 600,
+                    color: cores.cinza,
+                    marginBottom: 10,
+                  }}
+                >
+                  Categorias
+                </h2>
+                <button
+                  onClick={limparCategorias}
+                  style={{
+                    marginBottom: 10,
+                    background: cores.cinza,
+                    color: "white",
+                    border: "none",
+                    borderRadius: 6,
+                    padding: "6px 10px",
+                  }}
+                >
+                  Limpar filtros
+                </button>
+                {categorias.map((cat, idx) => (
+                  <div key={idx} style={{ marginBottom: 6 }}>
+                    <label style={{ color: cores.cinza }}>
+                      <input
+                        type="checkbox"
+                        checked={categoriasSelecionadas.includes(cat)}
+                        onChange={() => toggleCategoria(cat)}
+                        style={{ marginRight: 6 }}
+                      />
+                      {cat}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         <input
           placeholder="Buscar por nome do produto..."
