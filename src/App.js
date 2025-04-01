@@ -44,6 +44,66 @@ function App() {
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
+  const renderImagens = (p, pidx) => {
+    const imagens = [p.imagem_d1, p.imagem_d2, p.imagem_d3].filter(Boolean);
+    const index = sliderIndex[pidx] || 0;
+
+    const updateIndex = (newIndex) => {
+      setSliderIndex((prev) => ({ ...prev, [pidx]: newIndex }));
+    };
+
+    if (imagens.length <= 1) {
+      return (
+        <img
+          src={imagens[0]}
+          alt={p.nome}
+          style={{ width: "100%", height: 150, objectFit: "cover" }}
+        />
+      );
+    }
+
+    return (
+      <div style={{ position: "relative" }}>
+        <img
+          src={imagens[index]}
+          alt={p.nome}
+          style={{ width: "100%", height: 150, objectFit: "cover" }}
+        />
+        <button
+          onClick={() => updateIndex((index - 1 + imagens.length) % imagens.length)}
+          style={setaEstilo("left")}
+        >
+          ❮
+        </button>
+        <button
+          onClick={() => updateIndex((index + 1) % imagens.length)}
+          style={setaEstilo("right")}
+        >
+          ❯
+        </button>
+      </div>
+    );
+  };
+
+  const setaEstilo = (lado) => ({
+    position: "absolute",
+    top: "50%",
+    [lado]: 10,
+    transform: "translateY(-50%)",
+    background: "#f57c00",
+    color: "#fff",
+    border: "none",
+    borderRadius: "50%",
+    width: 28,
+    height: 28,
+    cursor: "pointer",
+    fontSize: 14,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    boxShadow: "0 1px 4px rgba(0,0,0,0.3)",
+  });
+
   return (
     <div style={{ display: "flex", minHeight: "100vh", fontFamily: "Arial, sans-serif", color: "#4d4d4d" }}>
       {!isMobile && (
@@ -138,11 +198,7 @@ function App() {
                     color: "#4d4d4d",
                   }}
                 >
-                  <img
-                    src={p.imagem_d1}
-                    alt={p.nome}
-                    style={{ width: "100%", height: 150, objectFit: "cover" }}
-                  />
+                  {renderImagens(p, pidx)}
                   <div style={{ padding: 12 }}>
                     <h3 style={{ fontSize: 16, fontWeight: "bold", color: "#4d4d4d" }}>{p.nome}</h3>
                     <p style={{ fontSize: 14, color: "#4d4d4d" }}>Ref: {p.referencia}</p>
