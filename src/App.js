@@ -7,6 +7,7 @@ function App() {
   const [isMobile, setIsMobile] = useState(false);
   const [mostrarCategoriasMobile, setMostrarCategoriasMobile] = useState(false);
   const [sliderIndex, setSliderIndex] = useState({});
+  const [mostrarTopo, setMostrarTopo] = useState(false);
 
   useEffect(() => {
     fetch("/produtos.json")
@@ -18,6 +19,18 @@ function App() {
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setMostrarTopo(window.scrollY > 300);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const cores = {
     laranja: "#F58220",
@@ -81,238 +94,29 @@ function App() {
         minHeight: "100vh",
       }}
     >
-      {!isMobile && (
-        <aside
+      {/* ... restante do código ... */}
+
+      {mostrarTopo && (
+        <button
+          onClick={scrollToTop}
           style={{
-            width: 180,
-            padding: 20,
-            borderRight: "1px solid #ddd",
-            background: cores.cinzaClaro,
+            position: "fixed",
+            bottom: 20,
+            right: 20,
+            background: cores.laranja,
+            color: cores.branco,
+            border: "none",
+            borderRadius: "50%",
+            width: 40,
+            height: 40,
+            fontSize: 20,
+            cursor: "pointer",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
           }}
         >
-          <h2
-            style={{
-              fontSize: 16,
-              fontWeight: 600,
-              color: cores.cinza,
-              marginBottom: 10,
-            }}
-          >
-            Categorias
-          </h2>
-          <button
-            onClick={limparCategorias}
-            style={{
-              background: cores.laranja,
-              color: cores.branco,
-              border: "none",
-              borderRadius: 6,
-              padding: "6px 10px",
-              fontSize: 14,
-              cursor: "pointer",
-              marginBottom: 12,
-              width: "100%",
-            }}
-          >
-            Limpar filtros
-          </button>
-          <ul style={{ listStyle: "none", padding: 0 }}>
-            {categorias.map((cat, idx) => (
-              <li key={idx} style={{ marginBottom: 6 }}>
-                <label style={{ color: cores.cinza, fontSize: 14 }}>
-                  <input
-                    type="checkbox"
-                    checked={categoriasSelecionadas.includes(cat)}
-                    onChange={() => toggleCategoria(cat)}
-                    style={{ marginRight: 6 }}
-                  />
-                  {cat}
-                </label>
-              </li>
-            ))}
-          </ul>
-        </aside>
+          ▲
+        </button>
       )}
-
-      <main style={{ flex: 1, padding: 20, background: cores.cinzaClaro }}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 20,
-          }}
-        >
-          <h1
-            style={{
-              fontSize: isMobile ? 24 : 34,
-              fontWeight: 700,
-              color: cores.cinza,
-              margin: 0,
-            }}
-          >
-            Catálogo Sense
-          </h1>
-          <img src="/logo-rg.png" alt="Logo RG" style={{ height: 70 }} />
-        </div>
-
-        {isMobile && (
-          <div style={{ marginBottom: 16 }}>
-            <button
-              onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)}
-              style={{
-                background: cores.laranja,
-                color: cores.branco,
-                border: "none",
-                padding: "8px 12px",
-                borderRadius: 6,
-                fontWeight: 500,
-                marginBottom: 10,
-              }}
-            >
-              {mostrarCategoriasMobile ? "Esconder categorias" : "Filtrar categorias"}
-            </button>
-            {mostrarCategoriasMobile && (
-              <div>
-                <h2
-                  style={{
-                    fontSize: 16,
-                    fontWeight: 600,
-                    color: cores.cinza,
-                    marginBottom: 10,
-                  }}
-                >
-                  Categorias
-                </h2>
-                <button
-                  onClick={limparCategorias}
-                  style={{
-                    marginBottom: 10,
-                    background: cores.cinza,
-                    color: "white",
-                    border: "none",
-                    borderRadius: 6,
-                    padding: "6px 10px",
-                  }}
-                >
-                  Limpar filtros
-                </button>
-                {categorias.map((cat, idx) => (
-                  <div key={idx} style={{ marginBottom: 6 }}>
-                    <label style={{ color: cores.cinza }}>
-                      <input
-                        type="checkbox"
-                        checked={categoriasSelecionadas.includes(cat)}
-                        onChange={() => toggleCategoria(cat)}
-                        style={{ marginRight: 6 }}
-                      />
-                      {cat}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        <input
-          placeholder="Buscar por nome do produto..."
-          style={{
-            width: "100%",
-            maxWidth: 400,
-            padding: 10,
-            borderRadius: 6,
-            border: "1px solid #ccc",
-            marginBottom: 30,
-            display: "block",
-            marginInline: isMobile ? "auto" : 0,
-          }}
-          value={filtro}
-          onChange={(e) => setFiltro(e.target.value)}
-        />
-
-        {produtosFiltradosPorCategoria.map(({ categoria, produtos }) => (
-          <div key={categoria} style={{ marginBottom: 40 }}>
-            <h2 style={{ fontSize: 20, fontWeight: 600, color: cores.cinza, marginBottom: 16 }}>
-              {categoria}
-            </h2>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(auto-fill, minmax(220px, 1fr))",
-                gap: 20,
-              }}
-            >
-              {produtos.map((p, idx) => {
-                const imagens = [p.imagem_d1, p.imagem_d2, p.imagem_d3].filter(Boolean);
-                const imagemAtual = imagens[sliderIndex[p.referencia] || 0] || imagens[0];
-                return (
-                  <div
-                    key={idx}
-                    style={{
-                      border: "1px solid #ddd",
-                      borderRadius: 10,
-                      overflow: "hidden",
-                      background: "#fff",
-                      boxShadow: "0 2px 6px rgba(0,0,0,0.06)",
-                    }}
-                  >
-                    {imagemAtual && (
-                      <div style={{ position: "relative" }}>
-                        <img
-                          src={imagemAtual}
-                          alt={p.nome}
-                          style={{ width: "100%", height: 150, objectFit: "cover" }}
-                        />
-                        {imagens.length > 1 && (
-                          <>
-                            <button
-                              onClick={() => handlePrev(p.referencia, imagens.length)}
-                              style={{
-                                position: "absolute",
-                                top: "50%",
-                                left: 5,
-                                transform: "translateY(-50%)",
-                                background: "#fff",
-                                border: "none",
-                                borderRadius: "50%",
-                                padding: "2px 6px",
-                                cursor: "pointer",
-                              }}
-                            >
-                              ◀
-                            </button>
-                            <button
-                              onClick={() => handleNext(p.referencia, imagens.length)}
-                              style={{
-                                position: "absolute",
-                                top: "50%",
-                                right: 5,
-                                transform: "translateY(-50%)",
-                                background: "#fff",
-                                border: "none",
-                                borderRadius: "50%",
-                                padding: "2px 6px",
-                                cursor: "pointer",
-                              }}
-                            >
-                              ▶
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    )}
-                    <div style={{ padding: 12 }}>
-                      <h3 style={{ fontSize: 16, fontWeight: "bold", color: cores.cinza }}>{p.nome}</h3>
-                      <p style={{ fontSize: 14, color: "#555" }}>Ref: {p.referencia}</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-      </main>
     </div>
   );
 }
