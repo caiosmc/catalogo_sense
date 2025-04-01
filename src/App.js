@@ -1,12 +1,9 @@
-// App.js completo com a barra de busca centralizada no mobile
-
 import { useEffect, useState } from "react";
 import {
   obterCategoriasDaURL,
   obterTermoBuscaDaURL,
-  atualizarParametrosURL,
+  atualizarURLComCategorias,
   atualizarURLComBusca,
-  atualizarURLComCategorias
 } from "./utils/urlFiltros";
 
 function App() {
@@ -47,18 +44,22 @@ function App() {
   const categorias = [...new Set(produtos.map((p) => p.categoria))];
 
   const toggleCategoria = (cat) => {
-    if (cat === "__ALL__") {
+    if (cat === "Selecionar tudo") {
       if (categoriasSelecionadas.length === categorias.length) {
         setCategoriasSelecionadas([]);
       } else {
-        setCategoriasSelecionadas([...categorias]);
+        setCategoriasSelecionadas(categorias);
       }
     } else {
       setCategoriasSelecionadas((prev) => {
-        const novaLista = prev.includes(cat)
+        const novaSelecao = prev.includes(cat)
           ? prev.filter((c) => c !== cat)
           : [...prev, cat];
-        return novaLista;
+
+        if (novaSelecao.length === categorias.length) {
+          return categorias;
+        }
+        return novaSelecao;
       });
     }
   };
@@ -76,13 +77,16 @@ function App() {
     return matchNome && matchCategoria;
   });
 
-  const agrupadosPorCategoria = categoriasSelecionadas.length > 0 ? categoriasSelecionadas : categorias;
+  const agrupadosPorCategoria = categoriasSelecionadas.length > 0
+    ? categoriasSelecionadas
+    : categorias;
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   const renderImagens = (p, pidx) => {
     const imagens = [p.imagem_d1, p.imagem_d2, p.imagem_d3].filter(Boolean);
     const index = sliderIndex[pidx] || 0;
+
     const updateIndex = (newIndex) => {
       setSliderIndex((prev) => ({ ...prev, [pidx]: newIndex }));
     };
@@ -96,8 +100,12 @@ function App() {
     return (
       <div style={{ position: "relative" }}>
         <img src={imagens[index]} alt={p.nome} style={{ width: "100%", height: 150, objectFit: "cover" }} />
-        <button onClick={() => updateIndex((index - 1 + imagens.length) % imagens.length)} style={setaEstilo("left")}>❮</button>
-        <button onClick={() => updateIndex((index + 1) % imagens.length)} style={setaEstilo("right")}>❯</button>
+        <button onClick={() => updateIndex((index - 1 + imagens.length) % imagens.length)} style={setaEstilo("left")}>
+          ❮
+        </button>
+        <button onClick={() => updateIndex((index + 1) % imagens.length)} style={setaEstilo("right")}>
+          ❯
+        </button>
       </div>
     );
   };
@@ -118,7 +126,7 @@ function App() {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    boxShadow: "0 1px 4px rgba(0,0,0,0.3)"
+    boxShadow: "0 1px 4px rgba(0,0,0,0.3)",
   });
 
   const estiloBotaoMobile = {
@@ -134,7 +142,7 @@ function App() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", fontFamily: "Arial, sans-serif", color: "#4d4d4d", backgroundColor: "#f5f5f5" }}>
+    <div style={{ display: "flex", minHeight: "100vh", fontFamily: "Arial, sans-serif", color: "#4d4d4d", background: "#f3f3f3" }}>
       {!isMobile && (
         <aside style={{ width: 200, padding: 20, borderRight: "1px solid #ddd" }}>
           <div>
@@ -143,30 +151,26 @@ function App() {
           </div>
           <button onClick={limparCategorias} style={{ backgroundColor: "#f57c00", color: "#fff", marginBottom: 10, padding: 6, fontSize: 12, border: "none", borderRadius: 4 }}>Limpar filtros</button>
           <ul style={{ listStyle: "none", padding: 0 }}>
-            <li>
-              <label style={{ display: "block", fontSize: 12 }}>
-                <input
-                  type="checkbox"
-                  checked={categoriasSelecionadas.length === categorias.length}
-                  onChange={() => toggleCategoria("__ALL__")}
-                  style={{ marginRight: 8 }}
-                />
-                Selecionar tudo
-              </label>
-            </li>
-            {categorias.map((cat, idx) => (
-              <li key={idx}>
-                <label style={{ display: "block", fontSize: 12 }}>
-                  <input
-                    type="checkbox"
-                    checked={categoriasSelecionadas.includes(cat)}
-                    onChange={() => toggleCategoria(cat)}
-                    style={{ marginRight: 8 }}
-                  />
-                  {cat}
-                </label>
-              </li>
-            ))}
+            {["Selecionar tudo", ...categorias].map((cat, idx) => {
+              const quantidade = produtosFiltrados.filter((p) => cat === "Selecionar tudo" || p.categoria === cat).length;
+              return (
+                <li key={idx}>
+                  <label style={{ display: "block", fontSize: 11, color: "#4d4d4d" }}>
+                    <input
+                      type="checkbox"
+                      checked={
+                        cat === "Selecionar tudo"
+                          ? categoriasSelecionadas.length === categorias.length
+                          : categoriasSelecionadas.includes(cat)
+                      }
+                      onChange={() => toggleCategoria(cat)}
+                      style={{ marginRight: 8 }}
+                    />
+                    {cat} ({quantidade})
+                  </label>
+                </li>
+              );
+            })}
           </ul>
         </aside>
       )}
@@ -193,62 +197,75 @@ function App() {
             </div>
             {mostrarCategoriasMobile && (
               <ul style={{ listStyle: "none", padding: 0, marginTop: 10 }}>
-                <li>
-                  <label style={{ display: "block", fontSize: 14 }}>
-                    <input
-                      type="checkbox"
-                      checked={categoriasSelecionadas.length === categorias.length}
-                      onChange={() => toggleCategoria("__ALL__")}
-                      style={{ marginRight: 8 }}
-                    />
-                    Selecionar tudo
-                  </label>
-                </li>
-                {categorias.map((cat, idx) => (
-                  <li key={idx}>
-                    <label style={{ display: "block", fontSize: 14 }}>
-                      <input
-                        type="checkbox"
-                        checked={categoriasSelecionadas.includes(cat)}
-                        onChange={() => toggleCategoria(cat)}
-                        style={{ marginRight: 8 }}
-                      />
-                      {cat}
-                    </label>
-                  </li>
-                ))}
+                {["Selecionar tudo", ...categorias].map((cat, idx) => {
+                  const quantidade = produtosFiltrados.filter((p) => cat === "Selecionar tudo" || p.categoria === cat).length;
+                  return (
+                    <li key={idx}>
+                      <label style={{ display: "block", fontSize: 14, color: "#4d4d4d" }}>
+                        <input
+                          type="checkbox"
+                          checked={
+                            cat === "Selecionar tudo"
+                              ? categoriasSelecionadas.length === categorias.length
+                              : categoriasSelecionadas.includes(cat)
+                          }
+                          onChange={() => toggleCategoria(cat)}
+                          style={{ marginRight: 8 }}
+                        />
+                        {cat} ({quantidade})
+                      </label>
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </div>
         )}
 
-        {/* Centralizando a barra de busca */}
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <input
-            placeholder="Buscar por nome do produto..."
-            style={{
-              width: "100%",
-              maxWidth: 400,
-              padding: 10,
-              borderRadius: 6,
-              border: "1px solid #ccc",
-              marginBottom: 30,
-              color: "#4d4d4d"
-            }}
-            value={filtro}
-            onChange={(e) => setFiltro(e.target.value)}
-          />
-        </div>
+        <input
+          placeholder="Buscar por nome do produto..."
+          style={{
+            width: "100%",
+            maxWidth: 400,
+            padding: 10,
+            borderRadius: 6,
+            border: "1px solid #ccc",
+            marginBottom: 30,
+            display: "block",
+            marginLeft: "auto",
+            marginRight: "auto",
+            color: "#4d4d4d"
+          }}
+          value={filtro}
+          onChange={(e) => setFiltro(e.target.value)}
+        />
 
         {agrupadosPorCategoria.map((cat, idx) => {
           const produtosDaCategoria = produtosFiltrados.filter((p) => p.categoria === cat);
           if (produtosDaCategoria.length === 0) return null;
+
           return (
             <div key={idx}>
               <h2 style={{ color: "#4d4d4d", fontSize: 22, marginTop: 40 }}>{cat} | {produtosDaCategoria.length}</h2>
-              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(auto-fill, minmax(200px, 1fr))", gap: 20 }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(auto-fill, minmax(200px, 1fr))",
+                  gap: 20,
+                }}
+              >
                 {produtosDaCategoria.map((p, pidx) => (
-                  <div key={pidx} style={{ border: "1px solid #ddd", borderRadius: 10, overflow: "hidden", background: "#fff", boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)", color: "#4d4d4d" }}>
+                  <div
+                    key={pidx}
+                    style={{
+                      border: "1px solid #ddd",
+                      borderRadius: 10,
+                      overflow: "hidden",
+                      background: "#fff",
+                      boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
+                      color: "#4d4d4d",
+                    }}
+                  >
                     {renderImagens(p, pidx)}
                     <div style={{ padding: 12 }}>
                       <h3 style={{ fontSize: 16, fontWeight: "bold", color: "#4d4d4d" }}>{p.nome}</h3>
