@@ -153,28 +153,30 @@ function App() {
         {isMobile && (
           <div style={{ margin: "20px 0" }}>
             <h2 style={{ color: "#4d4d4d", fontSize: 16, marginBottom: 10 }}>Filtre as Categorias</h2>
-            <button onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)} style={estiloBotaoMobile}>
-              {mostrarCategoriasMobile ? "Ocultar categorias" : "Mostrar categorias"}
-            </button>
-            {mostrarCategoriasMobile && (
-              <>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <button onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)} style={estiloBotaoMobile}>
+                {mostrarCategoriasMobile ? "Ocultar categorias" : "Mostrar categorias"}
+              </button>
+              {mostrarCategoriasMobile && (
                 <button onClick={limparCategorias} style={estiloBotaoMobile}>Limpar filtros</button>
-                <ul style={{ listStyle: "none", padding: 0 }}>
-                  {categorias.map((cat, idx) => (
-                    <li key={idx}>
-                      <label style={{ display: "block", fontSize: 14, color: "#4d4d4d" }}>
-                        <input
-                          type="checkbox"
-                          checked={categoriasSelecionadas.includes(cat)}
-                          onChange={() => toggleCategoria(cat)}
-                          style={{ marginRight: 8 }}
-                        />
-                        {cat}
-                      </label>
-                    </li>
-                  ))}
-                </ul>
-              </>
+              )}
+            </div>
+            {mostrarCategoriasMobile && (
+              <ul style={{ listStyle: "none", padding: 0, marginTop: 10 }}>
+                {categorias.map((cat, idx) => (
+                  <li key={idx}>
+                    <label style={{ display: "block", fontSize: 14, color: "#4d4d4d" }}>
+                      <input
+                        type="checkbox"
+                        checked={categoriasSelecionadas.includes(cat)}
+                        onChange={() => toggleCategoria(cat)}
+                        style={{ marginRight: 8 }}
+                      />
+                      {cat}
+                    </label>
+                  </li>
+                ))}
+              </ul>
             )}
           </div>
         )}
@@ -237,14 +239,18 @@ function App() {
           position: "fixed",
           bottom: 20,
           right: 20,
-          padding: 10,
+          width: 48,
+          height: 48,
           borderRadius: "50%",
           border: "none",
           backgroundColor: "#f57c00",
           color: "white",
-          fontSize: 20,
+          fontSize: 24,
           cursor: "pointer",
           boxShadow: "0 2px 5px rgba(0,0,0,0.3)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center"
         }}
         aria-label="Voltar ao topo"
       >
