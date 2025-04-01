@@ -46,7 +46,7 @@ function App() {
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", fontFamily: "Arial, sans-serif" }}>
+    <div style={{ display: "flex", minHeight: "100vh", fontFamily: "Arial, sans-serif", color: "#4d4d4d" }}>
       {/* Sidebar */}
       {!isMobile && (
         <aside style={{ width: 200, padding: 20, borderRight: "1px solid #ddd" }}>
@@ -55,7 +55,7 @@ function App() {
           <ul style={{ listStyle: "none", padding: 0 }}>
             {categorias.map((cat, idx) => (
               <li key={idx}>
-                <label style={{ display: "block", fontSize: 14 }}>
+                <label style={{ display: "block", fontSize: 14, color: "#4d4d4d" }}>
                   <input
                     type="checkbox"
                     checked={categoriasSelecionadas.includes(cat)}
@@ -83,7 +83,7 @@ function App() {
             <ul style={{ listStyle: "none", padding: 0 }}>
               {categorias.map((cat, idx) => (
                 <li key={idx}>
-                  <label style={{ display: "block", fontSize: 14 }}>
+                  <label style={{ display: "block", fontSize: 14, color: "#4d4d4d" }}>
                     <input
                       type="checkbox"
                       checked={categoriasSelecionadas.includes(cat)}
@@ -112,7 +112,8 @@ function App() {
             marginBottom: 30,
             display: "block",
             marginLeft: "auto",
-            marginRight: "auto"
+            marginRight: "auto",
+            color: "#4d4d4d"
           }}
           value={filtro}
           onChange={(e) => setFiltro(e.target.value)}
@@ -137,6 +138,7 @@ function App() {
                     overflow: "hidden",
                     background: "#fff",
                     boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
+                    color: "#4d4d4d"
                   }}
                 >
                   <img
@@ -145,8 +147,8 @@ function App() {
                     style={{ width: "100%", height: 150, objectFit: "cover" }}
                   />
                   <div style={{ padding: 12 }}>
-                    <h3 style={{ fontSize: 16, fontWeight: "bold" }}>{p.nome}</h3>
-                    <p style={{ fontSize: 14, color: "#555" }}>Ref: {p.referencia}</p>
+                    <h3 style={{ fontSize: 16, fontWeight: "bold", color: "#4d4d4d" }}>{p.nome}</h3>
+                    <p style={{ fontSize: 14, color: "#4d4d4d" }}>Ref: {p.referencia}</p>
                   </div>
                 </div>
               ))}
