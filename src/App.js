@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { setFiltersToURL } from "../utils/urlFiltros";
 
 function App() {
   const [produtos, setProdutos] = useState([]);
@@ -23,14 +24,18 @@ function App() {
   const categorias = [...new Set(produtos.map((p) => p.categoria))];
 
   const toggleCategoria = (cat) => {
-    setCategoriasSelecionadas((prev) =>
-      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
-    );
+    const novasCategorias = categoriasSelecionadas.includes(cat)
+      ? categoriasSelecionadas.filter((c) => c !== cat)
+      : [...categoriasSelecionadas, cat];
+
+    setCategoriasSelecionadas(novasCategorias);
+    setFiltersToURL({ categoria: novasCategorias });
   };
 
   const limparCategorias = () => {
     setCategoriasSelecionadas([]);
     setFiltro("");
+    setFiltersToURL({ categoria: [] });
   };
 
   const produtosFiltrados = produtos.filter((p) => {
