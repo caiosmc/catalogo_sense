@@ -1,4 +1,4 @@
-""import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 function App() {
   const [produtos, setProdutos] = useState([]);
@@ -45,11 +45,29 @@ function App() {
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", fontFamily: "Arial, sans-serif", color: "#4d4d4d" }}>
+    <div
+      style={{
+        display: "flex",
+        minHeight: "100vh",
+        fontFamily: "Arial, sans-serif",
+        color: "#4d4d4d",
+      }}
+    >
       {!isMobile && (
         <aside style={{ width: 200, padding: 20, borderRight: "1px solid #ddd" }}>
-          <h2 style={{ fontSize: 20, color: "#4d4d4d", marginBottom: 10, textDecoration: "underline" }}>Categorias</h2>
-          <button onClick={limparCategorias} style={{ marginBottom: 10, padding: 6, fontSize: 12 }}>Limpar filtros</button>
+          <h2
+            style={{
+              fontSize: 20,
+              color: "#4d4d4d",
+              marginBottom: 10,
+              textDecoration: "underline",
+            }}
+          >
+            Categorias
+          </h2>
+          <button onClick={limparCategorias} style={{ marginBottom: 10, padding: 6, fontSize: 12 }}>
+            Limpar filtros
+          </button>
           <ul style={{ listStyle: "none", padding: 0 }}>
             {categorias.map((cat, idx) => (
               <li key={idx}>
@@ -92,7 +110,12 @@ function App() {
                 </li>
               ))}
               <li>
-                <button onClick={limparCategorias} style={{ marginTop: 10, padding: 6, fontSize: 12 }}>Limpar filtros</button>
+                <button
+                  onClick={limparCategorias}
+                  style={{ marginTop: 10, padding: 6, fontSize: 12 }}
+                >
+                  Limpar filtros
+                </button>
               </li>
             </ul>
           </div>
@@ -110,7 +133,7 @@ function App() {
             display: "block",
             marginLeft: "auto",
             marginRight: "auto",
-            color: "#4d4d4d"
+            color: "#4d4d4d",
           }}
           value={filtro}
           onChange={(e) => setFiltro(e.target.value)}
@@ -127,27 +150,7 @@ function App() {
               }}
             >
               {produtosFiltrados.filter((p) => p.categoria === cat).map((p, pidx) => (
-                <div
-                  key={pidx}
-                  style={{
-                    border: "1px solid #ddd",
-                    borderRadius: 10,
-                    overflow: "hidden",
-                    background: "#fff",
-                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
-                    color: "#4d4d4d"
-                  }}
-                >
-                  <img
-                    src={p.imagem_d1}
-                    alt={p.nome}
-                    style={{ width: "100%", height: 150, objectFit: "cover" }}
-                  />
-                  <div style={{ padding: 12 }}>
-                    <h3 style={{ fontSize: 16, fontWeight: "bold", color: "#4d4d4d" }}>{p.nome}</h3>
-                    <p style={{ fontSize: 14, color: "#4d4d4d" }}>Ref: {p.referencia}</p>
-                  </div>
-                </div>
+                <ProdutoCard key={pidx} produto={p} />
               ))}
             </div>
           </div>
@@ -173,6 +176,83 @@ function App() {
       >
         ↑
       </button>
+    </div>
+  );
+}
+
+function ProdutoCard({ produto }) {
+  const imagens = [produto.imagem_d1, produto.imagem_d2, produto.imagem_d3].filter(Boolean);
+  const [index, setIndex] = useState(0);
+
+  return (
+    <div
+      style={{
+        border: "1px solid #ddd",
+        borderRadius: 10,
+        overflow: "hidden",
+        background: "#fff",
+        boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
+        color: "#4d4d4d",
+        position: "relative",
+      }}
+    >
+      <div style={{ position: "relative" }}>
+        <img
+          src={imagens[index]}
+          alt={produto.nome}
+          style={{ width: "100%", height: 150, objectFit: "cover" }}
+        />
+        {imagens.length > 1 && (
+          <>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIndex((prev) => (prev - 1 + imagens.length) % imagens.length);
+              }}
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: 10,
+                transform: "translateY(-50%)",
+                background: "#ffffffcc",
+                border: "none",
+                borderRadius: "50%",
+                width: 24,
+                height: 24,
+                fontSize: 16,
+                cursor: "pointer",
+              }}
+            >
+              ‹
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIndex((prev) => (prev + 1) % imagens.length);
+              }}
+              style={{
+                position: "absolute",
+                top: "50%",
+                right: 10,
+                transform: "translateY(-50%)",
+                background: "#ffffffcc",
+                border: "none",
+                borderRadius: "50%",
+                width: 24,
+                height: 24,
+                fontSize: 16,
+                cursor: "pointer",
+              }}
+            >
+              ›
+            </button>
+          </>
+        )}
+      </div>
+      <div style={{ padding: 12 }}>
+        <h3 style={{ fontSize: 16, fontWeight: "bold", color: "#4d4d4d" }}>{produto.nome}</h3>
+        <p style={{ fontSize: 14, color: "#4d4d4d" }}>Ref: {produto.referencia}</p>
+      </div>
     </div>
   );
 }
