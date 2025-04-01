@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 function App() {
   const [produtos, setProdutos] = useState([]);
   const [filtro, setFiltro] = useState("");
-  const [categoriaSelecionada, setCategoriaSelecionada] = useState("Todos os produtos");
+  const [categoriasSelecionadas, setCategoriasSelecionadas] = useState(["Todos os produtos"]);
   const [isMobile, setIsMobile] = useState(false);
   const [sliderIndex, setSliderIndex] = useState({});
 
@@ -18,12 +18,26 @@ function App() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  const categorias = ["Todos os produtos", ...new Set(produtos.map(p => p.categoria))];
+  const categorias = [...new Set(produtos.map(p => p.categoria))];
+
+  const toggleCategoria = (cat) => {
+    if (categoriasSelecionadas.includes(cat)) {
+      const updated = categoriasSelecionadas.filter(c => c !== cat);
+      setCategoriasSelecionadas(updated.length ? updated : ["Todos os produtos"]);
+    } else {
+      const updated = categoriasSelecionadas.filter(c => c !== "Todos os produtos").concat(cat);
+      setCategoriasSelecionadas(updated);
+    }
+  };
+
+  const limparCategorias = () => {
+    setCategoriasSelecionadas(["Todos os produtos"]);
+  };
 
   const produtosFiltrados = produtos.filter((p) => {
     const matchNome = p.nome.toLowerCase().includes(filtro.toLowerCase());
     const matchCategoria =
-      categoriaSelecionada === "Todos os produtos" || p.categoria === categoriaSelecionada;
+      categoriasSelecionadas.includes("Todos os produtos") || categoriasSelecionadas.includes(p.categoria);
     return matchNome && matchCategoria;
   });
 
@@ -46,42 +60,37 @@ function App() {
     <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", fontFamily: "Arial, sans-serif", minHeight: "100vh" }}>
 
       {!isMobile && (
-        <aside style={{ width: 180, padding: 20, borderRight: "1px solid #ddd", background: cores.cinzaClaro }}>
-          <h2
-            style={{
-              fontSize: 18,
-              fontWeight: 600,
-              marginBottom: 16,
-              color: cores.cinza,
-              borderBottom: `2px solid ${cores.laranja}`,
-              paddingBottom: 6,
-              letterSpacing: 0.5
-            }}
-          >
-            Categorias
-          </h2>
-          <ul style={{ listStyle: "none", padding: 0 }}>
+        <aside style={{ width: 200, padding: 20, borderRight: "1px solid #ddd", background: cores.cinzaClaro }}>
+          <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: cores.cinza, borderBottom: `2px solid ${cores.laranja}`, paddingBottom: 6, letterSpacing: 0.5 }}>Categorias</h2>
+          <ul style={{ listStyle: "none", padding: 0, marginBottom: 20 }}>
             {categorias.map((cat, idx) => (
               <li key={idx} style={{ marginBottom: 8 }}>
-                <button
-                  onClick={() => setCategoriaSelecionada(cat)}
-                  style={{
-                    background: categoriaSelecionada === cat ? cores.laranja : "transparent",
-                    color: categoriaSelecionada === cat ? cores.branco : cores.cinza,
-                    border: "1px solid #ccc",
-                    borderRadius: 8,
-                    padding: "8px 12px",
-                    width: "100%",
-                    textAlign: "left",
-                    cursor: "pointer",
-                    fontWeight: 500
-                  }}
-                >
+                <label style={{ color: cores.cinza }}>
+                  <input
+                    type="checkbox"
+                    checked={categoriasSelecionadas.includes(cat)}
+                    onChange={() => toggleCategoria(cat)}
+                    style={{ marginRight: 8 }}
+                  />
                   {cat}
-                </button>
+                </label>
               </li>
             ))}
           </ul>
+          <button
+            onClick={limparCategorias}
+            style={{
+              background: cores.laranja,
+              color: cores.branco,
+              border: "none",
+              borderRadius: 6,
+              padding: "8px 12px",
+              cursor: "pointer",
+              fontWeight: 500
+            }}
+          >
+            Limpar filtros
+          </button>
         </aside>
       )}
 
@@ -95,9 +104,13 @@ function App() {
           <div style={{ marginBottom: 20 }}>
             <label style={{ fontWeight: "bold" }}>Filtre a categoria desejada:</label>
             <select
+              multiple
               style={{ width: "100%", padding: 10, borderRadius: 6, marginTop: 8 }}
-              value={categoriaSelecionada}
-              onChange={(e) => setCategoriaSelecionada(e.target.value)}
+              value={categoriasSelecionadas.includes("Todos os produtos") ? [] : categoriasSelecionadas}
+              onChange={(e) => {
+                const selected = Array.from(e.target.selectedOptions).map(opt => opt.value);
+                setCategoriasSelecionadas(selected.length ? selected : ["Todos os produtos"]);
+              }}
             >
               {categorias.map((cat, idx) => (
                 <option key={idx} value={cat}>{cat}</option>
@@ -123,8 +136,8 @@ function App() {
           />
         </div>
 
-        {categoriaSelecionada === "Todos os produtos"
-          ? categorias.filter(c => c !== "Todos os produtos").map((cat, idx) => {
+        {categoriasSelecionadas.includes("Todos os produtos")
+          ? categorias.map((cat, idx) => {
               const produtosDaCategoria = produtosFiltrados.filter(p => p.categoria === cat);
               if (!produtosDaCategoria.length) return null;
               return (
@@ -138,34 +151,13 @@ function App() {
                     {produtosDaCategoria.map((p, idx) => {
                       const imagens = [p.imagem_d1, p.imagem_d2, p.imagem_d3].filter(Boolean);
                       const imgIndex = sliderIndex[p.referencia] || 0;
-
                       return (
-                        <div key={idx} style={{
-                          borderRadius: 10,
-                          overflow: "hidden",
-                          background: cores.branco,
-                          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-                          position: "relative"
-                        }}>
-                          <img
-                            src={imagens[imgIndex]}
-                            alt={p.nome}
-                            style={{ width: "100%", height: 160, objectFit: "cover" }}
-                          />
+                        <div key={idx} style={{ borderRadius: 10, overflow: "hidden", background: cores.branco, boxShadow: "0 2px 8px rgba(0,0,0,0.08)", position: "relative" }}>
+                          <img src={imagens[imgIndex]} alt={p.nome} style={{ width: "100%", height: 160, objectFit: "cover" }} />
                           {imagens.length > 1 && (
                             <>
-                              <button onClick={() => handlePrev(p.referencia)} style={{
-                                position: "absolute", top: "50%", left: 5, transform: "translateY(-50%)",
-                                background: cores.branco, border: "none", borderRadius: "50%",
-                                width: 24, height: 24, fontSize: 14,
-                                boxShadow: "0 1px 4px rgba(0,0,0,0.2)", cursor: "pointer"
-                              }}>‹</button>
-                              <button onClick={() => handleNext(p.referencia)} style={{
-                                position: "absolute", top: "50%", right: 5, transform: "translateY(-50%)",
-                                background: cores.branco, border: "none", borderRadius: "50%",
-                                width: 24, height: 24, fontSize: 14,
-                                boxShadow: "0 1px 4px rgba(0,0,0,0.2)", cursor: "pointer"
-                              }}>›</button>
+                              <button onClick={() => handlePrev(p.referencia)} style={{ position: "absolute", top: "50%", left: 5, transform: "translateY(-50%)", background: cores.branco, border: "none", borderRadius: "50%", width: 24, height: 24, fontSize: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.2)", cursor: "pointer" }}>‹</button>
+                              <button onClick={() => handleNext(p.referencia)} style={{ position: "absolute", top: "50%", right: 5, transform: "translateY(-50%)", background: cores.branco, border: "none", borderRadius: "50%", width: 24, height: 24, fontSize: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.2)", cursor: "pointer" }}>›</button>
                             </>
                           )}
                           <div style={{ padding: 12 }}>
@@ -188,34 +180,13 @@ function App() {
               {produtosFiltrados.map((p, idx) => {
                 const imagens = [p.imagem_d1, p.imagem_d2, p.imagem_d3].filter(Boolean);
                 const imgIndex = sliderIndex[p.referencia] || 0;
-
                 return (
-                  <div key={idx} style={{
-                    borderRadius: 10,
-                    overflow: "hidden",
-                    background: cores.branco,
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-                    position: "relative"
-                  }}>
-                    <img
-                      src={imagens[imgIndex]}
-                      alt={p.nome}
-                      style={{ width: "100%", height: 160, objectFit: "cover" }}
-                    />
+                  <div key={idx} style={{ borderRadius: 10, overflow: "hidden", background: cores.branco, boxShadow: "0 2px 8px rgba(0,0,0,0.08)", position: "relative" }}>
+                    <img src={imagens[imgIndex]} alt={p.nome} style={{ width: "100%", height: 160, objectFit: "cover" }} />
                     {imagens.length > 1 && (
                       <>
-                        <button onClick={() => handlePrev(p.referencia)} style={{
-                          position: "absolute", top: "50%", left: 5, transform: "translateY(-50%)",
-                          background: cores.branco, border: "none", borderRadius: "50%",
-                          width: 24, height: 24, fontSize: 14,
-                          boxShadow: "0 1px 4px rgba(0,0,0,0.2)", cursor: "pointer"
-                        }}>‹</button>
-                        <button onClick={() => handleNext(p.referencia)} style={{
-                          position: "absolute", top: "50%", right: 5, transform: "translateY(-50%)",
-                          background: cores.branco, border: "none", borderRadius: "50%",
-                          width: 24, height: 24, fontSize: 14,
-                          boxShadow: "0 1px 4px rgba(0,0,0,0.2)", cursor: "pointer"
-                        }}>›</button>
+                        <button onClick={() => handlePrev(p.referencia)} style={{ position: "absolute", top: "50%", left: 5, transform: "translateY(-50%)", background: cores.branco, border: "none", borderRadius: "50%", width: 24, height: 24, fontSize: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.2)", cursor: "pointer" }}>‹</button>
+                        <button onClick={() => handleNext(p.referencia)} style={{ position: "absolute", top: "50%", right: 5, transform: "translateY(-50%)", background: cores.branco, border: "none", borderRadius: "50%", width: 24, height: 24, fontSize: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.2)", cursor: "pointer" }}>›</button>
                       </>
                     )}
                     <div style={{ padding: 12 }}>
