@@ -1,4 +1,10 @@
 import { useEffect, useState } from "react";
+import {
+  obterCategoriasDaURL,
+  atualizarURLComCategorias,
+  obterBuscaDaURL,
+  atualizarURLComBusca,
+} from "./utils/urlFiltros";
 
 function App() {
   const [produtos, setProdutos] = useState([]);
@@ -19,6 +25,22 @@ function App() {
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
+  useEffect(() => {
+    const categoriasNaURL = obterCategoriasDaURL();
+    const buscaNaURL = obterBuscaDaURL();
+
+    if (categoriasNaURL.length) setCategoriasSelecionadas(categoriasNaURL);
+    if (buscaNaURL) setFiltro(buscaNaURL);
+  }, []);
+
+  useEffect(() => {
+    atualizarURLComCategorias(categoriasSelecionadas);
+  }, [categoriasSelecionadas]);
+
+  useEffect(() => {
+    atualizarURLComBusca(filtro);
+  }, [filtro]);
 
   const categorias = [...new Set(produtos.map((p) => p.categoria))];
 
@@ -41,7 +63,8 @@ function App() {
     return matchNome && matchCategoria;
   });
 
-  const agrupadosPorCategoria = categoriasSelecionadas.length > 0 ? categoriasSelecionadas : categorias;
+  const agrupadosPorCategoria =
+    categoriasSelecionadas.length > 0 ? categoriasSelecionadas : categorias;
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
@@ -114,7 +137,7 @@ function App() {
     fontSize: 14,
     cursor: "pointer",
     boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-    marginBottom: 10
+    marginBottom: 10,
   };
 
   return (
@@ -125,7 +148,12 @@ function App() {
             <h2 style={{ fontSize: 18, color: "#4d4d4d", marginBottom: 4 }}>Categorias</h2>
             <div style={{ height: 4, backgroundColor: "#f57c00", width: 40, marginBottom: 10 }}></div>
           </div>
-          <button onClick={limparCategorias} style={{ backgroundColor: "#f57c00", color: "#fff", marginBottom: 10, padding: 6, fontSize: 12, border: "none", borderRadius: 4 }}>Limpar filtros</button>
+          <button
+            onClick={limparCategorias}
+            style={{ backgroundColor: "#f57c00", color: "#fff", marginBottom: 10, padding: 6, fontSize: 12, border: "none", borderRadius: 4 }}
+          >
+            Limpar filtros
+          </button>
           <ul style={{ listStyle: "none", padding: 0 }}>
             {categorias.map((cat, idx) => (
               <li key={idx}>
@@ -196,7 +224,7 @@ function App() {
             display: "block",
             marginLeft: "auto",
             marginRight: "auto",
-            color: "#4d4d4d"
+            color: "#4d4d4d",
           }}
           value={filtro}
           onChange={(e) => setFiltro(e.target.value)}
@@ -253,7 +281,7 @@ function App() {
           boxShadow: "0 2px 5px rgba(0,0,0,0.3)",
           display: "flex",
           alignItems: "center",
-          justifyContent: "center"
+          justifyContent: "center",
         }}
         aria-label="Voltar ao topo"
       >
