@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import {
-  atualizarCategoriasNaURL,
   obterCategoriasDaURL,
-  obterTermoBuscaDaURL,
-  atualizarTermoBuscaNaURL,
-} from "./urlFiltros";
+  atualizarURLComCategorias,
+  obterBuscaDaURL,
+  atualizarURLComBusca,
+} from "./utils/urlFiltros";
 
 function App() {
   const [produtos, setProdutos] = useState([]);
@@ -20,30 +20,38 @@ function App() {
       .then((data) => setProdutos(data))
       .catch((err) => console.error("Erro ao carregar produtos:", err));
 
-    setCategoriasSelecionadas(obterCategoriasDaURL());
-    setFiltro(obterTermoBuscaDaURL());
-
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  useEffect(() => {
+    const categoriasURL = obterCategoriasDaURL();
+    const buscaURL = obterBuscaDaURL();
+    setCategoriasSelecionadas(categoriasURL);
+    setFiltro(buscaURL);
+  }, []);
+
+  useEffect(() => {
+    atualizarURLComCategorias(categoriasSelecionadas);
+  }, [categoriasSelecionadas]);
+
+  useEffect(() => {
+    atualizarURLComBusca(filtro);
+  }, [filtro]);
+
   const categorias = [...new Set(produtos.map((p) => p.categoria))];
 
   const toggleCategoria = (cat) => {
-    setCategoriasSelecionadas((prev) => {
-      const atualizadas = prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat];
-      atualizarCategoriasNaURL(atualizadas);
-      return atualizadas;
-    });
+    setCategoriasSelecionadas((prev) =>
+      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
+    );
   };
 
   const limparCategorias = () => {
     setCategoriasSelecionadas([]);
     setFiltro("");
-    atualizarCategoriasNaURL([]);
-    atualizarTermoBuscaNaURL("");
   };
 
   const produtosFiltrados = produtos.filter((p) => {
@@ -54,9 +62,11 @@ function App() {
     return matchNome && matchCategoria;
   });
 
-  const agrupadosPorCategoria = categoriasSelecionadas.length > 0 ? categoriasSelecionadas : categorias;
+  const agrupadosPorCategoria =
+    categoriasSelecionadas.length > 0 ? categoriasSelecionadas : categorias;
 
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+  const scrollToTop = () =>
+    window.scrollTo({ top: 0, behavior: "smooth" });
 
   const renderImagens = (p, pidx) => {
     const imagens = [p.imagem_d1, p.imagem_d2, p.imagem_d3].filter(Boolean);
@@ -127,7 +137,7 @@ function App() {
     fontSize: 14,
     cursor: "pointer",
     boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-    marginBottom: 10
+    marginBottom: 10,
   };
 
   return (
@@ -209,13 +219,10 @@ function App() {
             display: "block",
             marginLeft: "auto",
             marginRight: "auto",
-            color: "#4d4d4d"
+            color: "#4d4d4d",
           }}
           value={filtro}
-          onChange={(e) => {
-            setFiltro(e.target.value);
-            atualizarTermoBuscaNaURL(e.target.value);
-          }}
+          onChange={(e) => setFiltro(e.target.value)}
         />
 
         {agrupadosPorCategoria.map((cat, idx) => (
@@ -269,7 +276,7 @@ function App() {
           boxShadow: "0 2px 5px rgba(0,0,0,0.3)",
           display: "flex",
           alignItems: "center",
-          justifyContent: "center"
+          justifyContent: "center",
         }}
         aria-label="Voltar ao topo"
       >
