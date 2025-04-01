@@ -6,6 +6,7 @@ function App() {
   const [categoriasSelecionadas, setCategoriasSelecionadas] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
   const [sliderIndex, setSliderIndex] = useState({});
+  const [mostrarCategoriasMobile, setMostrarCategoriasMobile] = useState(true);
 
   useEffect(() => {
     fetch("/produtos.json")
@@ -108,12 +109,15 @@ function App() {
     <div style={{ display: "flex", minHeight: "100vh", fontFamily: "Arial, sans-serif", color: "#4d4d4d" }}>
       {!isMobile && (
         <aside style={{ width: 200, padding: 20, borderRight: "1px solid #ddd" }}>
-          <h2 style={{ fontSize: 20, color: "#4d4d4d", marginBottom: 10, textDecoration: "underline" }}>Categorias</h2>
-          <button onClick={limparCategorias} style={{ marginBottom: 10, padding: 6, fontSize: 12 }}>Limpar filtros</button>
+          <div>
+            <h2 style={{ fontSize: 18, color: "#4d4d4d", marginBottom: 4 }}>Categorias</h2>
+            <div style={{ height: 4, backgroundColor: "#f57c00", width: 40, marginBottom: 10 }}></div>
+          </div>
+          <button onClick={limparCategorias} style={{ backgroundColor: "#f57c00", color: "#fff", marginBottom: 10, padding: 6, fontSize: 12, border: "none", borderRadius: 4 }}>Limpar filtros</button>
           <ul style={{ listStyle: "none", padding: 0 }}>
             {categorias.map((cat, idx) => (
               <li key={idx}>
-                <label style={{ display: "block", fontSize: 14, color: "#4d4d4d" }}>
+                <label style={{ display: "block", fontSize: 12, color: "#4d4d4d" }}>
                   <input
                     type="checkbox"
                     checked={categoriasSelecionadas.includes(cat)}
@@ -136,25 +140,32 @@ function App() {
 
         {isMobile && (
           <div style={{ margin: "20px 0" }}>
-            <label style={{ color: "#4d4d4d", fontSize: 16 }}>Filtre a categoria desejada</label>
-            <ul style={{ listStyle: "none", padding: 0 }}>
-              {categorias.map((cat, idx) => (
-                <li key={idx}>
-                  <label style={{ display: "block", fontSize: 14, color: "#4d4d4d" }}>
-                    <input
-                      type="checkbox"
-                      checked={categoriasSelecionadas.includes(cat)}
-                      onChange={() => toggleCategoria(cat)}
-                      style={{ marginRight: 8 }}
-                    />
-                    {cat}
-                  </label>
-                </li>
-              ))}
-              <li>
-                <button onClick={limparCategorias} style={{ marginTop: 10, padding: 6, fontSize: 12 }}>Limpar filtros</button>
-              </li>
-            </ul>
+            <button onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)} style={{ marginBottom: 10 }}>
+              {mostrarCategoriasMobile ? "Ocultar categorias" : "Mostrar categorias"}
+            </button>
+            {mostrarCategoriasMobile && (
+              <>
+                <label style={{ color: "#4d4d4d", fontSize: 16 }}>Filtre a categoria desejada</label>
+                <ul style={{ listStyle: "none", padding: 0 }}>
+                  {categorias.map((cat, idx) => (
+                    <li key={idx}>
+                      <label style={{ display: "block", fontSize: 14, color: "#4d4d4d" }}>
+                        <input
+                          type="checkbox"
+                          checked={categoriasSelecionadas.includes(cat)}
+                          onChange={() => toggleCategoria(cat)}
+                          style={{ marginRight: 8 }}
+                        />
+                        {cat}
+                      </label>
+                    </li>
+                  ))}
+                  <li>
+                    <button onClick={limparCategorias} style={{ marginTop: 10, padding: 6, fontSize: 12 }}>Limpar filtros</button>
+                  </li>
+                </ul>
+              </>
+            )}
           </div>
         )}
 
