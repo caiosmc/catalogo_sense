@@ -4,29 +4,22 @@ export function obterCategoriasDaURL() {
   return categorias ? categorias.split(",") : [];
 }
 
-export function atualizarURLComCategorias(categorias) {
-  const params = new URLSearchParams(window.location.search);
-  if (categorias.length > 0) {
-    params.set("categorias", categorias.join(","));
-  } else {
-    params.delete("categorias");
-  }
-  const novaURL = window.location.pathname + "?" + params.toString();
-  window.history.replaceState({}, "", novaURL);
-}
-
 export function obterBuscaDaURL() {
   const params = new URLSearchParams(window.location.search);
   return params.get("busca") || "";
 }
 
-export function atualizarURLComBusca(busca) {
-  const params = new URLSearchParams(window.location.search);
+export function atualizarParametrosURL(categorias, busca) {
+  const params = new URLSearchParams();
+
+  if (categorias.length > 0) {
+    params.set("categorias", categorias.join(","));
+  }
+
   if (busca) {
     params.set("busca", busca);
-  } else {
-    params.delete("busca");
   }
-  const novaURL = window.location.pathname + "?" + params.toString();
-  window.history.replaceState({}, "", novaURL);
+
+  const novaURL = `${window.location.pathname}?${params.toString()}`;
+  window.history.replaceState(null, "", novaURL);
 }
