@@ -77,20 +77,6 @@ function App() {
               </li>
             ))}
           </ul>
-          <button
-            onClick={limparCategorias}
-            style={{
-              background: cores.laranja,
-              color: cores.branco,
-              border: "none",
-              borderRadius: 6,
-              padding: "8px 12px",
-              cursor: "pointer",
-              fontWeight: 500
-            }}
-          >
-            Limpar filtros
-          </button>
         </aside>
       )}
 
@@ -119,6 +105,23 @@ function App() {
           </div>
         )}
 
+        <div style={{ display: "flex", justifyContent: isMobile ? "center" : "flex-end", marginBottom: 20 }}>
+          <button
+            onClick={limparCategorias}
+            style={{
+              background: cores.laranja,
+              color: cores.branco,
+              border: "none",
+              borderRadius: 6,
+              padding: "8px 12px",
+              cursor: "pointer",
+              fontWeight: 500
+            }}
+          >
+            Limpar filtros
+          </button>
+        </div>
+
         <div style={{ display: "flex", justifyContent: "center" }}>
           <input
             placeholder="Buscar por nome do produto..."
@@ -136,68 +139,40 @@ function App() {
           />
         </div>
 
-        {categoriasSelecionadas.includes("Todos os produtos")
-          ? categorias.map((cat, idx) => {
-              const produtosDaCategoria = produtosFiltrados.filter(p => p.categoria === cat);
-              if (!produtosDaCategoria.length) return null;
-              return (
-                <div key={idx} style={{ marginBottom: 40 }}>
-                  <h2 style={{ fontSize: 22, color: cores.cinza, marginBottom: 16 }}>{cat}</h2>
-                  <div style={{
-                    display: "grid",
-                    gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(auto-fill, minmax(220px, 1fr))",
-                    gap: 20
-                  }}>
-                    {produtosDaCategoria.map((p, idx) => {
-                      const imagens = [p.imagem_d1, p.imagem_d2, p.imagem_d3].filter(Boolean);
-                      const imgIndex = sliderIndex[p.referencia] || 0;
-                      return (
-                        <div key={idx} style={{ borderRadius: 10, overflow: "hidden", background: cores.branco, boxShadow: "0 2px 8px rgba(0,0,0,0.08)", position: "relative" }}>
-                          <img src={imagens[imgIndex]} alt={p.nome} style={{ width: "100%", height: 160, objectFit: "cover" }} />
-                          {imagens.length > 1 && (
-                            <>
-                              <button onClick={() => handlePrev(p.referencia)} style={{ position: "absolute", top: "50%", left: 5, transform: "translateY(-50%)", background: cores.branco, border: "none", borderRadius: "50%", width: 24, height: 24, fontSize: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.2)", cursor: "pointer" }}>‹</button>
-                              <button onClick={() => handleNext(p.referencia)} style={{ position: "absolute", top: "50%", right: 5, transform: "translateY(-50%)", background: cores.branco, border: "none", borderRadius: "50%", width: 24, height: 24, fontSize: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.2)", cursor: "pointer" }}>›</button>
-                            </>
-                          )}
-                          <div style={{ padding: 12 }}>
-                            <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 4, color: cores.cinza }}>{p.nome}</h3>
-                            <p style={{ fontSize: 13, color: "#888" }}>Ref: {p.referencia}</p>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })
-          : (
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(auto-fill, minmax(220px, 1fr))",
-              gap: 20
-            }}>
-              {produtosFiltrados.map((p, idx) => {
-                const imagens = [p.imagem_d1, p.imagem_d2, p.imagem_d3].filter(Boolean);
-                const imgIndex = sliderIndex[p.referencia] || 0;
-                return (
-                  <div key={idx} style={{ borderRadius: 10, overflow: "hidden", background: cores.branco, boxShadow: "0 2px 8px rgba(0,0,0,0.08)", position: "relative" }}>
-                    <img src={imagens[imgIndex]} alt={p.nome} style={{ width: "100%", height: 160, objectFit: "cover" }} />
-                    {imagens.length > 1 && (
-                      <>
-                        <button onClick={() => handlePrev(p.referencia)} style={{ position: "absolute", top: "50%", left: 5, transform: "translateY(-50%)", background: cores.branco, border: "none", borderRadius: "50%", width: 24, height: 24, fontSize: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.2)", cursor: "pointer" }}>‹</button>
-                        <button onClick={() => handleNext(p.referencia)} style={{ position: "absolute", top: "50%", right: 5, transform: "translateY(-50%)", background: cores.branco, border: "none", borderRadius: "50%", width: 24, height: 24, fontSize: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.2)", cursor: "pointer" }}>›</button>
-                      </>
-                    )}
-                    <div style={{ padding: 12 }}>
-                      <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 4, color: cores.cinza }}>{p.nome}</h3>
-                      <p style={{ fontSize: 13, color: "#888" }}>Ref: {p.referencia}</p>
+        {(categoriasSelecionadas.includes("Todos os produtos") ? categorias : categoriasSelecionadas).map((cat, idx) => {
+          const produtosDaCategoria = produtosFiltrados.filter(p => p.categoria === cat);
+          if (!produtosDaCategoria.length) return null;
+          return (
+            <div key={idx} style={{ marginBottom: 40 }}>
+              <h2 style={{ fontSize: 22, color: cores.cinza, marginBottom: 16 }}>{cat}</h2>
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(auto-fill, minmax(220px, 1fr))",
+                gap: 20
+              }}>
+                {produtosDaCategoria.map((p, idx) => {
+                  const imagens = [p.imagem_d1, p.imagem_d2, p.imagem_d3].filter(Boolean);
+                  const imgIndex = sliderIndex[p.referencia] || 0;
+                  return (
+                    <div key={idx} style={{ borderRadius: 10, overflow: "hidden", background: cores.branco, boxShadow: "0 2px 8px rgba(0,0,0,0.08)", position: "relative" }}>
+                      <img src={imagens[imgIndex]} alt={p.nome} style={{ width: "100%", height: 160, objectFit: "cover" }} />
+                      {imagens.length > 1 && (
+                        <>
+                          <button onClick={() => handlePrev(p.referencia)} style={{ position: "absolute", top: "50%", left: 5, transform: "translateY(-50%)", background: cores.branco, border: "none", borderRadius: "50%", width: 24, height: 24, fontSize: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.2)", cursor: "pointer" }}>‹</button>
+                          <button onClick={() => handleNext(p.referencia)} style={{ position: "absolute", top: "50%", right: 5, transform: "translateY(-50%)", background: cores.branco, border: "none", borderRadius: "50%", width: 24, height: 24, fontSize: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.2)", cursor: "pointer" }}>›</button>
+                        </>
+                      )}
+                      <div style={{ padding: 12 }}>
+                        <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 4, color: cores.cinza }}>{p.nome}</h3>
+                        <p style={{ fontSize: 13, color: "#888" }}>Ref: {p.referencia}</p>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          )}
+          );
+        })}
       </main>
     </div>
   );
