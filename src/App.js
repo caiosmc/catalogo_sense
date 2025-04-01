@@ -32,6 +32,7 @@ function App() {
 
     if (categoriasNaURL.length) setCategoriasSelecionadas(categoriasNaURL);
     if (buscaNaURL) setFiltro(buscaNaURL);
+
   }, []);
 
   useEffect(() => {
@@ -66,7 +67,8 @@ function App() {
   const agrupadosPorCategoria =
     categoriasSelecionadas.length > 0 ? categoriasSelecionadas : categorias;
 
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+  const scrollToTop = () =>
+    window.scrollTo({ top: 0, behavior: "smooth" });
 
   const renderImagens = (p, pidx) => {
     const imagens = [p.imagem_d1, p.imagem_d2, p.imagem_d3].filter(Boolean);
