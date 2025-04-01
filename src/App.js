@@ -50,7 +50,7 @@ function App() {
       {/* Sidebar */}
       {!isMobile && (
         <aside style={{ width: 200, padding: 20, borderRight: "1px solid #ddd" }}>
-          <h2 style={{ fontSize: 20, color: "#4d4d4d", marginBottom: 10 }}>Categorias</h2>
+          <h2 style={{ fontSize: 20, color: "#4d4d4d", marginBottom: 10, textDecoration: "underline" }}>Categorias</h2>
           <button onClick={limparCategorias} style={{ marginBottom: 10, padding: 6, fontSize: 12 }}>Limpar filtros</button>
           <ul style={{ listStyle: "none", padding: 0 }}>
             {categorias.map((cat, idx) => (
