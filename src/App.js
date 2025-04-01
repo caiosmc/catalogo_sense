@@ -27,10 +27,12 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const categoriasURL = obterCategoriasDaURL();
-    const buscaURL = obterBuscaDaURL();
-    setCategoriasSelecionadas(categoriasURL);
-    setFiltro(buscaURL);
+    const categoriasNaURL = obterCategoriasDaURL();
+    const buscaNaURL = obterBuscaDaURL();
+
+    if (categoriasNaURL.length) setCategoriasSelecionadas(categoriasNaURL);
+    if (buscaNaURL) setFiltro(buscaNaURL);
+
   }, []);
 
   useEffect(() => {
@@ -148,7 +150,12 @@ function App() {
             <h2 style={{ fontSize: 18, color: "#4d4d4d", marginBottom: 4 }}>Categorias</h2>
             <div style={{ height: 4, backgroundColor: "#f57c00", width: 40, marginBottom: 10 }}></div>
           </div>
-          <button onClick={limparCategorias} style={{ backgroundColor: "#f57c00", color: "#fff", marginBottom: 10, padding: 6, fontSize: 12, border: "none", borderRadius: 4 }}>Limpar filtros</button>
+          <button
+            onClick={limparCategorias}
+            style={{ backgroundColor: "#f57c00", color: "#fff", marginBottom: 10, padding: 6, fontSize: 12, border: "none", borderRadius: 4 }}
+          >
+            Limpar filtros
+          </button>
           <ul style={{ listStyle: "none", padding: 0 }}>
             {categorias.map((cat, idx) => (
               <li key={idx}>
