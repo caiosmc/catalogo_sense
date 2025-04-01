@@ -58,17 +58,17 @@ function App() {
         ),
       }));
 
-  const handleNext = (ref) => {
+  const handleNext = (ref, total) => {
     setSliderIndex((prev) => ({
       ...prev,
-      [ref]: (prev[ref] || 0) + 1 > 2 ? 0 : (prev[ref] || 0) + 1,
+      [ref]: (prev[ref] || 0) + 1 >= total ? 0 : (prev[ref] || 0) + 1,
     }));
   };
 
-  const handlePrev = (ref) => {
+  const handlePrev = (ref, total) => {
     setSliderIndex((prev) => ({
       ...prev,
-      [ref]: (prev[ref] || 0) - 1 < 0 ? 2 : (prev[ref] || 0) - 1,
+      [ref]: (prev[ref] || 0) - 1 < 0 ? total - 1 : (prev[ref] || 0) - 1,
     }));
   };
 
@@ -244,7 +244,8 @@ function App() {
               }}
             >
               {produtos.map((p, idx) => {
-                const imagemAtual = p[`imagem_d${(sliderIndex[p.referencia] || 0) + 1}`];
+                const imagens = [p.imagem_d1, p.imagem_d2, p.imagem_d3].filter(Boolean);
+                const imagemAtual = imagens[sliderIndex[p.referencia] || 0] || imagens[0];
                 return (
                   <div
                     key={idx}
@@ -263,38 +264,42 @@ function App() {
                           alt={p.nome}
                           style={{ width: "100%", height: 150, objectFit: "cover" }}
                         />
-                        <button
-                          onClick={() => handlePrev(p.referencia)}
-                          style={{
-                            position: "absolute",
-                            top: "50%",
-                            left: 5,
-                            transform: "translateY(-50%)",
-                            background: "#fff",
-                            border: "none",
-                            borderRadius: "50%",
-                            padding: "2px 6px",
-                            cursor: "pointer",
-                          }}
-                        >
-                          ◀
-                        </button>
-                        <button
-                          onClick={() => handleNext(p.referencia)}
-                          style={{
-                            position: "absolute",
-                            top: "50%",
-                            right: 5,
-                            transform: "translateY(-50%)",
-                            background: "#fff",
-                            border: "none",
-                            borderRadius: "50%",
-                            padding: "2px 6px",
-                            cursor: "pointer",
-                          }}
-                        >
-                          ▶
-                        </button>
+                        {imagens.length > 1 && (
+                          <>
+                            <button
+                              onClick={() => handlePrev(p.referencia, imagens.length)}
+                              style={{
+                                position: "absolute",
+                                top: "50%",
+                                left: 5,
+                                transform: "translateY(-50%)",
+                                background: "#fff",
+                                border: "none",
+                                borderRadius: "50%",
+                                padding: "2px 6px",
+                                cursor: "pointer",
+                              }}
+                            >
+                              ◀
+                            </button>
+                            <button
+                              onClick={() => handleNext(p.referencia, imagens.length)}
+                              style={{
+                                position: "absolute",
+                                top: "50%",
+                                right: 5,
+                                transform: "translateY(-50%)",
+                                background: "#fff",
+                                border: "none",
+                                borderRadius: "50%",
+                                padding: "2px 6px",
+                                cursor: "pointer",
+                              }}
+                            >
+                              ▶
+                            </button>
+                          </>
+                        )}
                       </div>
                     )}
                     <div style={{ padding: 12 }}>
