@@ -220,9 +220,13 @@ function App() {
                       onClick={() => abrirModal(p)}
                     >
                       <img
-                        src={p.imagem_d1}
+                        src={p.imagem_d1 || p.imagem}
                         alt={p.nome}
                         style={{ width: "100%", height: 150, objectFit: "cover", marginBottom: 10 }}
+                        onError={(e) => {
+                          if (p.imagem) e.target.src = p.imagem;
+                          else e.target.style.display = "none";
+                        }}
                       />
                       <h4>{p.nome}</h4>
                       <p style={{ fontSize: 13, color: "#666" }}>Ref: {p.referencia}</p>
