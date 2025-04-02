@@ -44,3 +44,4 @@
     )}
   </div>
 )}
+export default App;
