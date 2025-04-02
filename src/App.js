@@ -140,11 +140,20 @@ function App() {
         )}
 
         <main style={{ flex: 1, padding: 20 }}>
-          {isMobile && (
-            <div style={{ marginBottom: 20 }}>
-              <button onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)} style={buttonStyle}>
-                {mostrarCategoriasMobile ? "Ocultar categorias" : "Mostrar categorias"}
-              </button>
+{isMobile && (
+  <div style={{ marginBottom: 20, display: "flex", gap: 10, flexWrap: "wrap" }}>
+    <button
+      onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)}
+      style={buttonStyle}
+    >
+      {mostrarCategoriasMobile ? "Ocultar categorias" : "Mostrar categorias"}
+    </button>
+
+    <button onClick={limparCategorias} style={buttonStyle}>
+      Limpar filtros
+    </button>
+  </div>
+)}
               {mostrarCategoriasMobile && (
                 <ul style={{ listStyle: "none", padding: 0, marginTop: 10 }}>
                   <li>
