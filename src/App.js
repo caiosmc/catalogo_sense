@@ -104,40 +104,49 @@ function App() {
       </div>
 
       <div style={{ display: "flex" }}>
-        {!isMobile && (
-          <aside style={{ width: 220, padding: 20 }}>
-            <h3 style={{ marginBottom: 10 }}>Categorias</h3>
-            <button onClick={limparCategorias} style={buttonStyle}>
-              Limpar filtros
-            </button>
-            <ul style={{ listStyle: "none", padding: 0, fontSize: 14 }}>
-              <li>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={categoriasSelecionadas.length === 0}
-                    onChange={() => toggleCategoria("__all__")}
-                    style={{ marginRight: 8 }}
-                  />
-                  Selecionar tudo ({produtosFiltrados.length})
-                </label>
-              </li>
-              {categorias.map((cat) => (
-                <li key={cat}>
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={categoriasSelecionadas.includes(cat)}
-                      onChange={() => toggleCategoria(cat)}
-                      style={{ marginRight: 8 }}
-                    />
-                    {cat} ({produtosFiltrados.filter((p) => p.categoria === cat).length})
-                  </label>
-                </li>
-              ))}
-            </ul>
-          </aside>
-        )}
+        {isMobile && (
+  <div style={{ marginBottom: 20, display: "flex", gap: 10, flexWrap: "wrap" }}>
+    <button
+      onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)}
+      style={buttonStyle}
+    >
+      {mostrarCategoriasMobile ? "Ocultar categorias" : "Mostrar categorias"}
+    </button>
+
+    <button onClick={limparCategorias} style={buttonStyle}>
+      Limpar filtros
+    </button>
+
+    {mostrarCategoriasMobile && (
+      <ul style={{ listStyle: "none", padding: 0, marginTop: 10 }}>
+        <li>
+          <label>
+            <input
+              type="checkbox"
+              checked={categoriasSelecionadas.length === 0}
+              onChange={() => toggleCategoria("__all__")}
+              style={{ marginRight: 8 }}
+            />
+            Selecionar tudo ({produtosFiltrados.length})
+          </label>
+        </li>
+        {categorias.map((cat) => (
+          <li key={cat}>
+            <label>
+              <input
+                type="checkbox"
+                checked={categoriasSelecionadas.includes(cat)}
+                onChange={() => toggleCategoria(cat)}
+                style={{ marginRight: 8 }}
+              />
+              {cat} ({produtosFiltrados.filter((p) => p.categoria === cat).length})
+            </label>
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+)}
 
         <main style={{ flex: 1, padding: 20 }}>
 {isMobile && (
