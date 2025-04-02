@@ -84,10 +84,11 @@ function App() {
     <div style={{ fontFamily: "Arial, sans-serif", color: "#333" }}>
       <div style={{ display: "flex", alignItems: "center", padding: 20 }}>
         <img src="/logo-rg.png" alt="Logo" style={{ width: 50, marginRight: 10 }} />
-        <h1 style={{ fontSize: 30 }}>
-          <span style={{ color: "#4d4d4d" }}>Catálogo </span>
-          <span style={{ color: "#f57c00" }}>Sense</span>
-        </h1>
+<h1 style={{ fontSize: 30 }}>
+  <span style={{ color: "#4d4d4d" }}>Catálogo </span>
+  <span style={{ color: "#f57c00" }}>Sense</span>
+  <span style={{ color: "#888", fontSize: 18, marginLeft: 10 }}>(HML)</span>
+</h1>
       </div>
 
       <div style={{ display: "flex" }}>
