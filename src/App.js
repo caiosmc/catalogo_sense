@@ -14,6 +14,7 @@ function App() {
   const [modalProduto, setModalProduto] = useState(null);
   const [imagemAtiva, setImagemAtiva] = useState(0);
   const [mostrarCategoriasMobile, setMostrarCategoriasMobile] = useState(false);
+  const [mostrarBotaoTopo, setMostrarBotaoTopo] = useState(false);
 
   useEffect(() => {
     fetch("/produtos.json")
@@ -22,9 +23,18 @@ function App() {
       .catch((err) => console.error("Erro ao carregar produtos:", err));
 
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    const checkScroll = () => setMostrarBotaoTopo(window.scrollY > 200);
+
     checkMobile();
+    checkScroll();
+
     window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    window.addEventListener("scroll", checkScroll);
+
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+      window.removeEventListener("scroll", checkScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -132,8 +142,11 @@ function App() {
               <button onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)} style={buttonStyle}>
                 {mostrarCategoriasMobile ? "Ocultar categorias" : "Mostrar categorias"}
               </button>
+              <button onClick={limparCategorias} style={{ ...buttonStyle, marginLeft: 10 }}>
+                Limpar filtros
+              </button>
               {mostrarCategoriasMobile && (
-                <ul style={{ listStyle: "none", padding: 0, marginTop: 10, fontSize: 12 }}>
+                <ul style={{ listStyle: "none", padding: 0, marginTop: 10 }}>
                   <li>
                     <label>
                       <input
@@ -147,7 +160,7 @@ function App() {
                   </li>
                   {categorias.map((cat) => (
                     <li key={cat}>
-                      <label style={{ fontSize: 12 }}>
+                      <label>
                         <input
                           type="checkbox"
                           checked={categoriasSelecionadas.includes(cat)}
@@ -163,9 +176,135 @@ function App() {
             </div>
           )}
 
-          {/* resto do código continua aqui... */}
+          <input
+            placeholder="Buscar por nome do produto..."
+            style={{
+              width: "100%",
+              maxWidth: 400,
+              padding: 10,
+              borderRadius: 6,
+              border: "1px solid #ccc",
+              marginBottom: 30,
+              display: "block",
+              marginLeft: "auto",
+              marginRight: "auto",
+            }}
+            value={filtro}
+            onChange={(e) => setFiltro(e.target.value)}
+          />
+
+          {agrupadosPorCategoria.map((cat, idx) => (
+            <div key={idx}>
+              <h2 style={{ marginTop: 40 }}>{cat}</h2>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(auto-fill, minmax(200px, 1fr))",
+                  gap: 20,
+                }}
+              >
+                {produtosFiltrados
+                  .filter((p) => p.categoria === cat)
+                  .map((p, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        border: "1px solid #ccc",
+                        padding: 10,
+                        borderRadius: 8,
+                        backgroundColor: "#fff",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => abrirModal(p)}
+                    >
+                      <img
+                        src={p.imagem_d1}
+                        alt={p.nome}
+                        style={{ width: "100%", height: 150, objectFit: "cover", marginBottom: 10 }}
+                      />
+                      <h4 onClick={() => abrirModal(p)}>{p.nome}</h4>
+                      <p style={{ fontSize: 13, color: "#666" }}>Ref: {p.referencia}</p>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          ))}
         </main>
       </div>
+
+      {modalProduto && (
+        <div style={modalOverlayStyle}>
+          <div style={modalContentStyle}>
+            <button onClick={fecharModal} style={modalCloseStyle}>✖</button>
+            <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row" }}>
+              <div style={{ flex: 1, padding: 10 }}>
+                <img
+                  src={modalProduto[`imagem_d${imagemAtiva + 1}`]}
+                  alt={modalProduto.nome}
+                  style={{ width: "100%", height: 300, objectFit: "contain", marginBottom: 10 }}
+                />
+                <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+                  {[1, 2, 3, 4, 5].map((n, i) => {
+                    const img = modalProduto[`imagem_d${n}`];
+                    if (!img) return null;
+                    return (
+                      <img
+                        key={i}
+                        src={img}
+                        alt={`mini-${n}`}
+                        style={{
+                          width: 60,
+                          height: 60,
+                          objectFit: "cover",
+                          border: i === imagemAtiva ? "2px solid #f57c00" : "1px solid #ccc",
+                          borderRadius: 6,
+                          cursor: "pointer",
+                        }}
+                        onClick={() => setImagemAtiva(i)}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+              <div style={{ flex: 1, padding: 10 }}>
+                <h2>{modalProduto.nome}</h2>
+                <p style={{ fontStyle: "italic", marginBottom: 8 }}>Ref: {modalProduto.referencia}</p>
+                <p>{modalProduto.descricao}</p>
+                {modalProduto.medidas && (
+                  <>
+                    <h4 style={{ marginTop: 20 }}>Medidas</h4>
+                    <p>{modalProduto.medidas}</p>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {mostrarBotaoTopo && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          style={{
+            position: "fixed",
+            bottom: 20,
+            right: 20,
+            width: 48,
+            height: 48,
+            borderRadius: "50%",
+            border: "none",
+            backgroundColor: "#f57c00",
+            color: "white",
+            fontSize: 24,
+            cursor: "pointer",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.3)",
+            zIndex: 1000,
+          }}
+          aria-label="Voltar ao topo"
+        >
+          ↑
+        </button>
+      )}
     </div>
   );
 }
