@@ -14,6 +14,7 @@ function App() {
   const [modalProduto, setModalProduto] = useState(null);
   const [imagemAtiva, setImagemAtiva] = useState(0);
   const [mostrarCategoriasMobile, setMostrarCategoriasMobile] = useState(false);
+  const [mostrarBotaoTopo, setMostrarBotaoTopo] = useState(false);
 
   useEffect(() => {
     fetch("/produtos.json")
@@ -22,9 +23,18 @@ function App() {
       .catch((err) => console.error("Erro ao carregar produtos:", err));
 
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    const checkScroll = () => setMostrarBotaoTopo(window.scrollY > 200);
+
     checkMobile();
+    checkScroll();
+
     window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    window.addEventListener("scroll", checkScroll);
+
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+      window.removeEventListener("scroll", checkScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -131,6 +141,9 @@ function App() {
             <div style={{ marginBottom: 20 }}>
               <button onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)} style={buttonStyle}>
                 {mostrarCategoriasMobile ? "Ocultar categorias" : "Mostrar categorias"}
+              </button>
+              <button onClick={limparCategorias} style={{ ...buttonStyle, marginLeft: 10 }}>
+                Limpar filtros
               </button>
               {mostrarCategoriasMobile && (
                 <ul style={{ listStyle: "none", padding: 0, marginTop: 10 }}>
@@ -267,6 +280,30 @@ function App() {
             </div>
           </div>
         </div>
+      )}
+
+      {mostrarBotaoTopo && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          style={{
+            position: "fixed",
+            bottom: 20,
+            right: 20,
+            width: 48,
+            height: 48,
+            borderRadius: "50%",
+            border: "none",
+            backgroundColor: "#f57c00",
+            color: "white",
+            fontSize: 24,
+            cursor: "pointer",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.3)",
+            zIndex: 1000,
+          }}
+          aria-label="Voltar ao topo"
+        >
+          ↑
+        </button>
       )}
     </div>
   );
