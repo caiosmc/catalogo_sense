@@ -23,10 +23,10 @@ function App() {
       .catch((err) => console.error("Erro ao carregar produtos:", err));
 
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    const aoRolar = () => setMostrarTopo(window.scrollY > 200);
+
     checkMobile();
     window.addEventListener("resize", checkMobile);
-
-    const aoRolar = () => setMostrarTopo(window.scrollY > 200);
     window.addEventListener("scroll", aoRolar);
 
     return () => {
@@ -34,10 +34,6 @@ function App() {
       window.removeEventListener("scroll", aoRolar);
     };
   }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
 
   useEffect(() => {
     const categoriasDaURL = obterCategoriasDaURL();
@@ -92,6 +88,10 @@ function App() {
     setModalProduto(null);
   };
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <div style={{ fontFamily: "Arial, sans-serif", color: "#333" }}>
       <div style={{ display: "flex", alignItems: "center", padding: 20 }}>
@@ -104,115 +104,3 @@ function App() {
       </div>
 
       <div style={{ display: "flex" }}>
-        {!isMobile && (
-          <aside style={{ width: 220, padding: 20 }}>
-            <h3 style={{ marginBottom: 10 }}>Categorias</h3>
-            <button onClick={limparCategorias} style={buttonStyle}>
-              Limpar filtros
-            </button>
-            <ul style={{ listStyle: "none", padding: 0, fontSize: 14 }}>
-              <li>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={categoriasSelecionadas.length === 0}
-                    onChange={() => toggleCategoria("__all__")}
-                    style={{ marginRight: 8 }}
-                  />
-                  Selecionar tudo ({produtosFiltrados.length})
-                </label>
-              </li>
-              {categorias.map((cat) => (
-                <li key={cat}>
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={categoriasSelecionadas.includes(cat)}
-                      onChange={() => toggleCategoria(cat)}
-                      style={{ marginRight: 8 }}
-                    />
-                    {cat} ({produtosFiltrados.filter((p) => p.categoria === cat).length})
-                  </label>
-                </li>
-              ))}
-            </ul>
-          </aside>
-        )}
-
-        <main style={{ flex: 1, padding: 20 }}>
-          {isMobile && (
-            <div style={{ marginBottom: 20 }}>
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <button onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)} style={buttonStyle}>
-                  {mostrarCategoriasMobile ? "Ocultar categorias" : "Mostrar categorias"}
-                </button>
-                <button onClick={limparCategorias} style={buttonStyle}>
-                  Limpar filtros
-                </button>
-              </div>
-              {mostrarCategoriasMobile && (
-                <ul style={{ listStyle: "none", padding: 0, marginTop: 10 }}>
-                  <li>
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={categoriasSelecionadas.length === 0}
-                        onChange={() => toggleCategoria("__all__")}
-                        style={{ marginRight: 8 }}
-                      />
-                      Selecionar tudo ({produtosFiltrados.length})
-                    </label>
-                  </li>
-                  {categorias.map((cat) => (
-                    <li key={cat}>
-                      <label>
-                        <input
-                          type="checkbox"
-                          checked={categoriasSelecionadas.includes(cat)}
-                          onChange={() => toggleCategoria(cat)}
-                          style={{ marginRight: 8 }}
-                        />
-                        {cat} ({produtosFiltrados.filter((p) => p.categoria === cat).length})
-                      </label>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          )}
-
-          <input
-            placeholder="Buscar por nome do produto..."
-            style={{
-              width: "100%",
-              maxWidth: 400,
-              padding: 10,
-              borderRadius: 6,
-              border: "1px solid #ccc",
-              marginBottom: 30,
-              display: "block",
-              marginLeft: "auto",
-              marginRight: "auto",
-            }}
-            value={filtro}
-            onChange={(e) => setFiltro(e.target.value)}
-          />
-
-          {/* restante do código permanece inalterado */}
-        </main>
-      </div>
-    </div>
-  );
-}
-
-const buttonStyle = {
-  backgroundColor: "#f57c00",
-  color: "white",
-  border: "none",
-  padding: "8px 12px",
-  borderRadius: 6,
-  marginBottom: 12,
-  cursor: "pointer",
-};
-
-export default App;
