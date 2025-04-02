@@ -14,6 +14,7 @@ function App() {
   const [modalProduto, setModalProduto] = useState(null);
   const [imagemAtiva, setImagemAtiva] = useState(0);
   const [mostrarCategoriasMobile, setMostrarCategoriasMobile] = useState(false);
+  const [mostrarTopo, setMostrarTopo] = useState(false);
 
   useEffect(() => {
     fetch("/produtos.json")
@@ -24,8 +25,19 @@ function App() {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
     window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+
+    const aoRolar = () => setMostrarTopo(window.scrollY > 200);
+    window.addEventListener("scroll", aoRolar);
+
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+      window.removeEventListener("scroll", aoRolar);
+    };
   }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   useEffect(() => {
     const categoriasDaURL = obterCategoriasDaURL();
@@ -84,11 +96,11 @@ function App() {
     <div style={{ fontFamily: "Arial, sans-serif", color: "#333" }}>
       <div style={{ display: "flex", alignItems: "center", padding: 20 }}>
         <img src="/logo-rg.png" alt="Logo" style={{ width: 50, marginRight: 10 }} />
-<h1 style={{ fontSize: 30 }}>
-  <span style={{ color: "#4d4d4d" }}>Catálogo </span>
-  <span style={{ color: "#f57c00" }}>Sense</span>
-  <span style={{ color: "#888", fontSize: 18, marginLeft: 10 }}>(HML)</span>
-</h1>
+        <h1 style={{ fontSize: 30 }}>
+          <span style={{ color: "#4d4d4d" }}>Catálogo </span>
+          <span style={{ color: "#f57c00" }}>Sense</span>
+          <span style={{ color: "#888", fontSize: 18, marginLeft: 10 }}>(HML)</span>
+        </h1>
       </div>
 
       <div style={{ display: "flex" }}>
@@ -210,7 +222,7 @@ function App() {
                         alt={p.nome}
                         style={{ width: "100%", height: 150, objectFit: "cover", marginBottom: 10 }}
                       />
-                      <h4 onClick={() => abrirModal(p)}>{p.nome}</h4>
+                      <h4>{p.nome}</h4>
                       <p style={{ fontSize: 13, color: "#666" }}>Ref: {p.referencia}</p>
                     </div>
                   ))}
@@ -268,6 +280,30 @@ function App() {
             </div>
           </div>
         </div>
+      )}
+
+      {mostrarTopo && (
+        <button
+          onClick={scrollToTop}
+          style={{
+            position: "fixed",
+            bottom: 20,
+            right: 20,
+            width: 48,
+            height: 48,
+            borderRadius: "50%",
+            border: "none",
+            backgroundColor: "#f57c00",
+            color: "white",
+            fontSize: 24,
+            cursor: "pointer",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.3)",
+            zIndex: 1000,
+          }}
+          aria-label="Voltar ao topo"
+        >
+          ↑
+        </button>
       )}
     </div>
   );
