@@ -107,7 +107,7 @@ function App() {
             <button onClick={limparCategorias} style={buttonStyle}>
               Limpar filtros
             </button>
-            <ul style={{ listStyle: "none", padding: 0, fontSize: 14 }}>
+            <ul style={{ listStyle: "none", padding: 0, fontSize: 12 }}>
               <li>
                 <label>
                   <input
