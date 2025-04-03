@@ -1,4 +1,3 @@
-// App.js (versão final com Supabase)
 import React, { useEffect, useState } from "react";
 import {
   obterCategoriasDaURL,
@@ -19,14 +18,19 @@ function App() {
 
   useEffect(() => {
     const carregarProdutos = async () => {
-      try {
-        const { data, error } = await supabase.from("tbl_produtos_xbz").select("*");
-        if (error) throw error;
-        setProdutos(data);
-      } catch (err) {
-        console.error("Erro ao carregar produtos:", err);
+      console.log("🔄 Iniciando fetch de produtos...");
+      const { data, error } = await supabase.from("tbl_produtos_xbz").select("*");
+
+      if (error) {
+        console.error("Erro ao carregar produtos do Supabase:", error);
+        return;
       }
+
+      const produtosFiltrados = data.filter((p) => p.categoria !== null);
+      setProdutos(produtosFiltrados);
+      console.log("✅ Produtos carregados:", produtosFiltrados.length);
     };
+
     carregarProdutos();
 
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
@@ -36,8 +40,10 @@ function App() {
   }, []);
 
   useEffect(() => {
-    setCategoriasSelecionadas(obterCategoriasDaURL());
-    setFiltro(obterTermoBuscaDaURL());
+    const categoriasDaURL = obterCategoriasDaURL();
+    const buscaDaURL = obterTermoBuscaDaURL();
+    setCategoriasSelecionadas(categoriasDaURL);
+    setFiltro(buscaDaURL);
   }, []);
 
   useEffect(() => {
@@ -48,7 +54,7 @@ function App() {
     atualizarURLComBusca(filtro);
   }, [filtro]);
 
-  const categorias = [...new Set(produtos.map((p) => p.categoria).filter(Boolean))];
+  const categorias = [...new Set(produtos.map((p) => p.categoria))];
 
   const toggleCategoria = (cat) => {
     if (cat === "__all__") {
@@ -66,7 +72,7 @@ function App() {
   };
 
   const produtosFiltrados = produtos.filter((p) => {
-    const matchNome = p.nome?.toLowerCase().includes(filtro.toLowerCase());
+    const matchNome = p.nome.toLowerCase().includes(filtro.toLowerCase());
     const matchCategoria =
       categoriasSelecionadas.length === 0 ||
       categoriasSelecionadas.includes(p.categoria);
@@ -100,7 +106,9 @@ function App() {
         {!isMobile && (
           <aside style={{ width: 220, padding: 20 }}>
             <h3 style={{ marginBottom: 10 }}>Categorias</h3>
-            <button onClick={limparCategorias} style={buttonStyle}>Limpar filtros</button>
+            <button onClick={limparCategorias} style={buttonStyle}>
+              Limpar filtros
+            </button>
             <ul style={{ listStyle: "none", padding: 0, fontSize: 14 }}>
               <li>
                 <label>
@@ -235,7 +243,7 @@ function App() {
                   style={{ width: "100%", height: 300, objectFit: "contain", marginBottom: 10 }}
                 />
                 <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-                  {[1, 2, 3, 4, 5, 6, 7].map((n, i) => {
+                  {[1, 2, 3, 4, 5].map((n, i) => {
                     const img = modalProduto[`imagem_d${n}`];
                     if (!img) return null;
                     return (
@@ -261,6 +269,12 @@ function App() {
                 <h2>{modalProduto.nome}</h2>
                 <p style={{ fontStyle: "italic", marginBottom: 8 }}>Ref: {modalProduto.referencia}</p>
                 <p>{modalProduto.descricao}</p>
+                {modalProduto.medidas && (
+                  <>
+                    <h4 style={{ marginTop: 20 }}>Medidas</h4>
+                    <p>{modalProduto.medidas}</p>
+                  </>
+                )}
               </div>
             </div>
           </div>
