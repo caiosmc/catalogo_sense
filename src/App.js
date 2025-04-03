@@ -1,4 +1,3 @@
-// src/App.js
 import React, { useEffect, useState } from "react";
 import {
   obterCategoriasDaURL,
@@ -23,13 +22,13 @@ function App() {
       const { data, error } = await supabase
         .from("tbl_produtos_xbz")
         .select("*")
-        .limit(10000)
+        .range(0, 9999)
         .order("categoria", { ascending: true })
         .order("subcategoria", { ascending: true })
         .order("nome", { ascending: true });
 
       if (error) {
-        console.error("Erro ao buscar produtos:", error);
+        console.error("Erro ao carregar produtos:", error);
       } else {
         console.log("Produtos recebidos:", data);
         setProdutos(data);
