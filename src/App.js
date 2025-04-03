@@ -17,21 +17,33 @@ function App() {
   const [mostrarCategoriasMobile, setMostrarCategoriasMobile] = useState(false);
 
   useEffect(() => {
-    const carregarProdutos = async () => {
-      console.log("🔄 Iniciando fetch de produtos...");
-      const { data, error } = await supabase.from("tbl_produtos_xbz").select("*");
+    const fetchTodosProdutos = async () => {
+      const batchSize = 1000;
+      let allData = [];
+      let start = 0;
+      let done = false;
 
-      if (error) {
-        console.error("Erro ao carregar produtos do Supabase:", error);
-        return;
+      while (!done) {
+        const { data, error } = await supabase
+          .from("tbl_produtos_xbz")
+          .select("*")
+          .not("categoria", "is", null)
+          .range(start, start + batchSize - 1);
+
+        if (error) {
+          console.error("Erro ao carregar produtos:", error);
+          break;
+        }
+
+        allData = [...allData, ...data];
+        if (data.length < batchSize) done = true;
+        else start += batchSize;
       }
 
-      const produtosFiltrados = data.filter((p) => p.categoria !== null);
-      setProdutos(produtosFiltrados);
-      console.log("✅ Produtos carregados:", produtosFiltrados.length);
+      setProdutos(allData);
     };
 
-    carregarProdutos();
+    fetchTodosProdutos();
 
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
@@ -72,7 +84,7 @@ function App() {
   };
 
   const produtosFiltrados = produtos.filter((p) => {
-    const matchNome = p.nome.toLowerCase().includes(filtro.toLowerCase());
+    const matchNome = p.nome?.toLowerCase().includes(filtro.toLowerCase());
     const matchCategoria =
       categoriasSelecionadas.length === 0 ||
       categoriasSelecionadas.includes(p.categoria);
@@ -139,42 +151,6 @@ function App() {
         )}
 
         <main style={{ flex: 1, padding: 20 }}>
-          {isMobile && (
-            <div style={{ marginBottom: 20 }}>
-              <button onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)} style={buttonStyle}>
-                {mostrarCategoriasMobile ? "Ocultar categorias" : "Mostrar categorias"}
-              </button>
-              {mostrarCategoriasMobile && (
-                <ul style={{ listStyle: "none", padding: 0, marginTop: 10 }}>
-                  <li>
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={categoriasSelecionadas.length === 0}
-                        onChange={() => toggleCategoria("__all__")}
-                        style={{ marginRight: 8 }}
-                      />
-                      Selecionar tudo ({produtosFiltrados.length})
-                    </label>
-                  </li>
-                  {categorias.map((cat) => (
-                    <li key={cat}>
-                      <label>
-                        <input
-                          type="checkbox"
-                          checked={categoriasSelecionadas.includes(cat)}
-                          onChange={() => toggleCategoria(cat)}
-                          style={{ marginRight: 8 }}
-                        />
-                        {cat} ({produtosFiltrados.filter((p) => p.categoria === cat).length})
-                      </label>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          )}
-
           <input
             placeholder="Buscar por nome do produto..."
             style={{
@@ -243,7 +219,7 @@ function App() {
                   style={{ width: "100%", height: 300, objectFit: "contain", marginBottom: 10 }}
                 />
                 <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-                  {[1, 2, 3, 4, 5].map((n, i) => {
+                  {[1, 2, 3, 4, 5, 6, 7].map((n, i) => {
                     const img = modalProduto[`imagem_d${n}`];
                     if (!img) return null;
                     return (
@@ -269,10 +245,10 @@ function App() {
                 <h2>{modalProduto.nome}</h2>
                 <p style={{ fontStyle: "italic", marginBottom: 8 }}>Ref: {modalProduto.referencia}</p>
                 <p>{modalProduto.descricao}</p>
-                {modalProduto.medidas && (
+                {modalProduto.medidas_aproximadas_para_gravacao_cxl && (
                   <>
                     <h4 style={{ marginTop: 20 }}>Medidas</h4>
-                    <p>{modalProduto.medidas}</p>
+                    <p>{modalProduto.medidas_aproximadas_para_gravacao_cxl}</p>
                   </>
                 )}
               </div>
