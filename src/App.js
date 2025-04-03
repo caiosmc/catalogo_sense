@@ -15,6 +15,7 @@ function App() {
   const [modalProduto, setModalProduto] = useState(null);
   const [imagemAtiva, setImagemAtiva] = useState(0);
   const [mostrarCategoriasMobile, setMostrarCategoriasMobile] = useState(false);
+  const [mostrarTopo, setMostrarTopo] = useState(false);
 
   useEffect(() => {
     async function fetchProdutosPaginado() {
@@ -51,9 +52,16 @@ function App() {
     fetchProdutosPaginado();
 
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    const handleScroll = () => setMostrarTopo(window.scrollY > window.innerHeight * 2);
+
     checkMobile();
     window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -88,6 +96,10 @@ function App() {
     setFiltro("");
   };
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const produtosFiltrados = produtos.filter((p) => {
     const matchNome = p.nome?.toLowerCase().includes(filtro.toLowerCase());
     const matchCategoria =
@@ -109,29 +121,26 @@ function App() {
     setModalProduto(null);
   };
 
-  const getImagemPrincipal = (produto) => {
-    return (
-      produto.imagem ||
-      produto.imagem_d1 ||
-      produto.imagem_d2 ||
-      produto.imagem_d3 ||
-      produto.imagem_d4 ||
-      produto.imagem_d5 ||
-      produto.imagem_d6 ||
-      produto.imagem_d7 ||
-      ""
-    );
+  const headerStyle = {
+    display: "flex",
+    alignItems: "center",
+    padding: 20,
+  };
+
+  const logoStyle = {
+    width: isMobile ? 70 : 130,
+    marginRight: 10,
+  };
+
+  const titleStyle = {
+    fontSize: isMobile ? 33 : 45,
   };
 
   return (
     <div style={{ fontFamily: "Arial, sans-serif", color: "#333" }}>
-      <div style={{ display: "flex", alignItems: "center", padding: 20 }}>
-        <img
-          src="/logo-rg.png"
-          alt="Logo"
-          style={{ width: isMobile ? 60 : 100, marginRight: 10 }}
-        />
-        <h1 style={{ fontSize: isMobile ? 27 : 42 }}>
+      <div style={headerStyle}>
+        <img src="/logo-rg.png" alt="Logo" style={logoStyle} />
+        <h1 style={titleStyle}>
           <span style={{ color: "#4d4d4d" }}>Catálogo </span>
           <span style={{ color: "#f57c00" }}>Sense</span>
         </h1>
@@ -180,9 +189,7 @@ function App() {
                 <button onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)} style={buttonStyle}>
                   {mostrarCategoriasMobile ? "Ocultar categorias" : "Mostrar categorias"}
                 </button>
-                <button onClick={limparCategorias} style={buttonStyle}>
-                  Limpar filtros
-                </button>
+                <button onClick={limparCategorias} style={buttonStyle}>Limpar filtros</button>
               </div>
               {mostrarCategoriasMobile && (
                 <ul style={{ listStyle: "none", padding: 0, marginTop: 10, fontSize: 12 }}>
@@ -257,7 +264,7 @@ function App() {
                       onClick={() => abrirModal(p)}
                     >
                       <img
-                        src={getImagemPrincipal(p)}
+                        src={p.imagem || p.imagem_d1 || p.imagem_d2 || p.imagem_d3 || p.imagem_d4 || p.imagem_d5 || p.imagem_d6 || p.imagem_d7}
                         alt={p.nome}
                         style={{ width: "100%", height: 150, objectFit: "cover", marginBottom: 10 }}
                       />
@@ -283,7 +290,7 @@ function App() {
                   style={{ width: "100%", height: 300, objectFit: "contain", marginBottom: 10 }}
                 />
                 <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-                  {[1, 2, 3, 4, 5].map((n, i) => {
+                  {[1, 2, 3, 4, 5, 6, 7].map((n, i) => {
                     const img = modalProduto[`imagem_d${n}`];
                     if (!img) return null;
                     return (
@@ -319,6 +326,30 @@ function App() {
             </div>
           </div>
         </div>
+      )}
+
+      {mostrarTopo && (
+        <button
+          onClick={scrollToTop}
+          style={{
+            position: "fixed",
+            bottom: 20,
+            right: 20,
+            width: 48,
+            height: 48,
+            borderRadius: "50%",
+            border: "none",
+            backgroundColor: "#f57c00",
+            color: "white",
+            fontSize: 24,
+            cursor: "pointer",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.3)",
+            zIndex: 1000,
+          }}
+          aria-label="Voltar ao topo"
+        >
+          ↑
+        </button>
       )}
     </div>
   );
