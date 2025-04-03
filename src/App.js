@@ -17,30 +17,38 @@ function App() {
   const [mostrarCategoriasMobile, setMostrarCategoriasMobile] = useState(false);
 
   useEffect(() => {
-    const fetchProdutos = async () => {
-      console.log("🔄 Iniciando fetch de produtos...");
-      const { data, error } = await supabase
-        .from("tbl_produtos_xbz")
-        .select("*")
-        .order("categoria", { ascending: true })
-        .order("subcategoria", { ascending: true })
-        .order("nome", { ascending: true })
-        .limit(10000);
+    async function fetchProdutosPaginado() {
+      console.log("Iniciando fetch de produtos...");
+      let todosProdutos = [];
+      let pagina = 0;
+      const tamanhoPagina = 1000;
 
-      if (error) {
-        console.error("❌ Erro ao buscar dados do Supabase:", {
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-        });
-        return;
+      while (true) {
+        const { data, error } = await supabase
+          .from("tbl_produtos_xbz")
+          .select("*")
+          .order("categoria", { ascending: true })
+          .order("subcategoria", { ascending: true })
+          .order("nome", { ascending: true })
+          .range(pagina * tamanhoPagina, (pagina + 1) * tamanhoPagina - 1);
+
+        if (error) {
+          console.error("Erro ao buscar dados do Supabase:", error);
+          break;
+        }
+
+        if (!data || data.length === 0) break;
+
+        todosProdutos = todosProdutos.concat(data);
+        if (data.length < tamanhoPagina) break;
+        pagina++;
       }
 
-      console.log("✅ Produtos recebidos:", data.length);
-      setProdutos(data);
-    };
+      console.log("Produtos recebidos:", todosProdutos.length);
+      setProdutos(todosProdutos);
+    }
 
-    fetchProdutos();
+    fetchProdutosPaginado();
 
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
@@ -63,7 +71,7 @@ function App() {
     atualizarURLComBusca(filtro);
   }, [filtro]);
 
-  const categorias = [...new Set(produtos.map((p) => p.categoria))].filter(Boolean);
+  const categorias = [...new Set(produtos.map((p) => p.categoria))];
 
   const toggleCategoria = (cat) => {
     if (cat === "__all__") {
@@ -150,10 +158,7 @@ function App() {
         <main style={{ flex: 1, padding: 20 }}>
           {isMobile && (
             <div style={{ marginBottom: 20 }}>
-              <button
-                onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)}
-                style={buttonStyle}
-              >
+              <button onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)} style={buttonStyle}>
                 {mostrarCategoriasMobile ? "Ocultar categorias" : "Mostrar categorias"}
               </button>
               {mostrarCategoriasMobile && (
