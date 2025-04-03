@@ -112,8 +112,8 @@ function App() {
   return (
     <div style={{ fontFamily: "Arial, sans-serif", color: "#333" }}>
       <div style={{ display: "flex", alignItems: "center", padding: 20 }}>
-        <img src="/logo-rg.png" alt="Logo" style={{ width: 50, marginRight: 10 }} />
-        <h1 style={{ fontSize: 30 }}>
+        <img src="/logo-rg.png" alt="Logo" style={{ width: 120, marginRight: 20 }} />
+        <h1 style={{ fontSize: 35 }}>
           <span style={{ color: "#4d4d4d" }}>Catálogo </span>
           <span style={{ color: "#f57c00" }}>Sense</span>
         </h1>
