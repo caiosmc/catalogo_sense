@@ -1,11 +1,12 @@
+// src/App.js
 import React, { useEffect, useState } from "react";
-import { supabase } from "./supabase";
 import {
   obterCategoriasDaURL,
   atualizarURLComCategorias,
   obterTermoBuscaDaURL,
   atualizarURLComBusca,
 } from "./utils/urlFiltros";
+import { supabase } from "./supabase";
 
 function App() {
   const [produtos, setProdutos] = useState([]);
@@ -22,6 +23,7 @@ function App() {
       const { data, error } = await supabase
         .from("tbl_produtos_xbz")
         .select("*")
+        .limit(10000)
         .order("categoria", { ascending: true })
         .order("subcategoria", { ascending: true })
         .order("nome", { ascending: true });
@@ -75,7 +77,7 @@ function App() {
   };
 
   const produtosFiltrados = produtos.filter((p) => {
-    const matchNome = p.nome.toLowerCase().includes(filtro.toLowerCase());
+    const matchNome = p.nome?.toLowerCase().includes(filtro.toLowerCase());
     const matchCategoria =
       categoriasSelecionadas.length === 0 ||
       categoriasSelecionadas.includes(p.categoria);
@@ -224,7 +226,7 @@ function App() {
                         alt={p.nome}
                         style={{ width: "100%", height: 150, objectFit: "cover", marginBottom: 10 }}
                       />
-                      <h4>{p.nome}</h4>
+                      <h4 onClick={() => abrirModal(p)}>{p.nome}</h4>
                       <p style={{ fontSize: 13, color: "#666" }}>Ref: {p.referencia}</p>
                     </div>
                   ))}
@@ -237,7 +239,7 @@ function App() {
       {modalProduto && (
         <div style={modalOverlayStyle}>
           <div style={modalContentStyle}>
-            <button onClick={fecharModal} style={modalCloseStyle}>\u2716</button>
+            <button onClick={fecharModal} style={modalCloseStyle}>✖</button>
             <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row" }}>
               <div style={{ flex: 1, padding: 10 }}>
                 <img
