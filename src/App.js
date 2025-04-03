@@ -109,7 +109,7 @@ function App() {
     setModalProduto(null);
   };
 
-  const obterImagemPrincipal = (produto) => {
+  const getImagemPrincipal = (produto) => {
     return (
       produto.imagem ||
       produto.imagem_d1 ||
@@ -117,6 +117,8 @@ function App() {
       produto.imagem_d3 ||
       produto.imagem_d4 ||
       produto.imagem_d5 ||
+      produto.imagem_d6 ||
+      produto.imagem_d7 ||
       ""
     );
   };
@@ -124,8 +126,12 @@ function App() {
   return (
     <div style={{ fontFamily: "Arial, sans-serif", color: "#333" }}>
       <div style={{ display: "flex", alignItems: "center", padding: 20 }}>
-        <img src="/logo-rg.png" alt="Logo" style={{ width: 100, marginRight: 10 }} />
-        <h1 style={{ fontSize: 40 }}>
+        <img
+          src="/logo-rg.png"
+          alt="Logo"
+          style={{ width: isMobile ? 60 : 100, marginRight: 10 }}
+        />
+        <h1 style={{ fontSize: isMobile ? 27 : 42 }}>
           <span style={{ color: "#4d4d4d" }}>Catálogo </span>
           <span style={{ color: "#f57c00" }}>Sense</span>
         </h1>
@@ -138,7 +144,7 @@ function App() {
             <button onClick={limparCategorias} style={buttonStyle}>
               Limpar filtros
             </button>
-            <ul style={{ listStyle: "none", padding: 0, fontSize: 14 }}>
+            <ul style={{ listStyle: "none", padding: 0, fontSize: 12 }}>
               <li>
                 <label>
                   <input
@@ -170,11 +176,16 @@ function App() {
         <main style={{ flex: 1, padding: 20 }}>
           {isMobile && (
             <div style={{ marginBottom: 20 }}>
-              <button onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)} style={buttonStyle}>
-                {mostrarCategoriasMobile ? "Ocultar categorias" : "Mostrar categorias"}
-              </button>
+              <div style={{ display: "flex", gap: 10 }}>
+                <button onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)} style={buttonStyle}>
+                  {mostrarCategoriasMobile ? "Ocultar categorias" : "Mostrar categorias"}
+                </button>
+                <button onClick={limparCategorias} style={buttonStyle}>
+                  Limpar filtros
+                </button>
+              </div>
               {mostrarCategoriasMobile && (
-                <ul style={{ listStyle: "none", padding: 0, marginTop: 10 }}>
+                <ul style={{ listStyle: "none", padding: 0, marginTop: 10, fontSize: 12 }}>
                   <li>
                     <label>
                       <input
@@ -246,11 +257,11 @@ function App() {
                       onClick={() => abrirModal(p)}
                     >
                       <img
-                        src={obterImagemPrincipal(p)}
+                        src={getImagemPrincipal(p)}
                         alt={p.nome}
                         style={{ width: "100%", height: 150, objectFit: "cover", marginBottom: 10 }}
                       />
-                      <h4 onClick={() => abrirModal(p)}>{p.nome}</h4>
+                      <h4>{p.nome}</h4>
                       <p style={{ fontSize: 13, color: "#666" }}>Ref: {p.referencia}</p>
                     </div>
                   ))}
@@ -267,7 +278,7 @@ function App() {
             <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row" }}>
               <div style={{ flex: 1, padding: 10 }}>
                 <img
-                  src={modalProduto[`imagem_d${imagemAtiva + 1}`] || modalProduto.imagem}
+                  src={modalProduto[`imagem_d${imagemAtiva + 1}`]}
                   alt={modalProduto.nome}
                   style={{ width: "100%", height: 300, objectFit: "contain", marginBottom: 10 }}
                 />
