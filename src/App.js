@@ -17,24 +17,30 @@ function App() {
   const [mostrarCategoriasMobile, setMostrarCategoriasMobile] = useState(false);
 
   useEffect(() => {
-    const carregarProdutos = async () => {
+    const fetchProdutos = async () => {
+      console.log("🔄 Iniciando fetch de produtos...");
       const { data, error } = await supabase
-        .from("tabela_produtos_xbz")
+        .from("tbl_produtos_xbz")
         .select("*")
-        .range(0, 9999)
         .order("categoria", { ascending: true })
         .order("subcategoria", { ascending: true })
-        .order("nome", { ascending: true });
+        .order("nome", { ascending: true })
+        .limit(10000);
 
       if (error) {
-        console.error("Erro ao buscar dados do Supabase:", error);
-      } else {
-        const produtosFiltrados = data.filter((p) => p.categoria !== null);
-        setProdutos(produtosFiltrados);
+        console.error("❌ Erro ao buscar dados do Supabase:", {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+        });
+        return;
       }
+
+      console.log("✅ Produtos recebidos:", data.length);
+      setProdutos(data);
     };
 
-    carregarProdutos();
+    fetchProdutos();
 
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
@@ -57,7 +63,7 @@ function App() {
     atualizarURLComBusca(filtro);
   }, [filtro]);
 
-  const categorias = [...new Set(produtos.map((p) => p.categoria))];
+  const categorias = [...new Set(produtos.map((p) => p.categoria))].filter(Boolean);
 
   const toggleCategoria = (cat) => {
     if (cat === "__all__") {
@@ -144,14 +150,14 @@ function App() {
         <main style={{ flex: 1, padding: 20 }}>
           {isMobile && (
             <div style={{ marginBottom: 20 }}>
-              <button onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)} style={buttonStyle}>
+              <button
+                onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)}
+                style={buttonStyle}
+              >
                 {mostrarCategoriasMobile ? "Ocultar categorias" : "Mostrar categorias"}
               </button>
-              <button onClick={limparCategorias} style={{ ...buttonStyle, marginLeft: 10 }}>
-                Limpar filtros
-              </button>
               {mostrarCategoriasMobile && (
-                <ul style={{ listStyle: "none", padding: 0, marginTop: 10, fontSize: 14 }}>
+                <ul style={{ listStyle: "none", padding: 0, marginTop: 10 }}>
                   <li>
                     <label>
                       <input
@@ -227,7 +233,7 @@ function App() {
                         alt={p.nome}
                         style={{ width: "100%", height: 150, objectFit: "cover", marginBottom: 10 }}
                       />
-                      <h4>{p.nome}</h4>
+                      <h4 onClick={() => abrirModal(p)}>{p.nome}</h4>
                       <p style={{ fontSize: 13, color: "#666" }}>Ref: {p.referencia}</p>
                     </div>
                   ))}
