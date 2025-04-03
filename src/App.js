@@ -52,15 +52,15 @@ function App() {
     fetchProdutosPaginado();
 
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
-    const handleScroll = () => setMostrarTopo(window.scrollY > window.innerHeight * 2);
-
     checkMobile();
     window.addEventListener("resize", checkMobile);
-    window.addEventListener("scroll", handleScroll);
+
+    const aoRolar = () => setMostrarTopo(window.scrollY > window.innerHeight * 2);
+    window.addEventListener("scroll", aoRolar);
 
     return () => {
       window.removeEventListener("resize", checkMobile);
-      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("scroll", aoRolar);
     };
   }, []);
 
@@ -121,26 +121,18 @@ function App() {
     setModalProduto(null);
   };
 
-  const headerStyle = {
-    display: "flex",
-    alignItems: "center",
-    padding: 20,
-  };
-
-  const logoStyle = {
-    width: isMobile ? 70 : 130,
-    marginRight: 10,
-  };
-
-  const titleStyle = {
-    fontSize: isMobile ? 33 : 45,
-  };
-
   return (
     <div style={{ fontFamily: "Arial, sans-serif", color: "#333" }}>
-      <div style={headerStyle}>
-        <img src="/logo-rg.png" alt="Logo" style={logoStyle} />
-        <h1 style={titleStyle}>
+      <div style={{ display: "flex", alignItems: "center", padding: 20 }}>
+        <img
+          src="/logo-rg.png"
+          alt="Logo"
+          style={{
+            width: isMobile ? 70 : 67.5,
+            marginRight: 10,
+          }}
+        />
+        <h1 style={{ fontSize: isMobile ? 33 : 48 }}>
           <span style={{ color: "#4d4d4d" }}>Catálogo </span>
           <span style={{ color: "#f57c00" }}>Sense</span>
         </h1>
@@ -185,12 +177,18 @@ function App() {
         <main style={{ flex: 1, padding: 20 }}>
           {isMobile && (
             <div style={{ marginBottom: 20 }}>
-              <div style={{ display: "flex", gap: 10 }}>
-                <button onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)} style={buttonStyle}>
-                  {mostrarCategoriasMobile ? "Ocultar categorias" : "Mostrar categorias"}
-                </button>
-                <button onClick={limparCategorias} style={buttonStyle}>Limpar filtros</button>
-              </div>
+              <button
+                onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)}
+                style={buttonStyle}
+              >
+                {mostrarCategoriasMobile ? "Ocultar categorias" : "Mostrar categorias"}
+              </button>
+              <button
+                onClick={limparCategorias}
+                style={{ ...buttonStyle, marginLeft: 10 }}
+              >
+                Limpar filtros
+              </button>
               {mostrarCategoriasMobile && (
                 <ul style={{ listStyle: "none", padding: 0, marginTop: 10, fontSize: 12 }}>
                   <li>
@@ -225,8 +223,8 @@ function App() {
           <input
             placeholder="Buscar por nome do produto..."
             style={{
-              width: "100%",
-              maxWidth: 400,
+              width: isMobile ? "90%" : "100%",
+              maxWidth: isMobile ? 280 : 400,
               padding: 10,
               borderRadius: 6,
               border: "1px solid #ccc",
@@ -245,7 +243,9 @@ function App() {
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(auto-fill, minmax(200px, 1fr))",
+                  gridTemplateColumns: isMobile
+                    ? "repeat(2, 1fr)"
+                    : "repeat(auto-fill, minmax(200px, 1fr))",
                   gap: 20,
                 }}
               >
@@ -264,9 +264,14 @@ function App() {
                       onClick={() => abrirModal(p)}
                     >
                       <img
-                        src={p.imagem || p.imagem_d1 || p.imagem_d2 || p.imagem_d3 || p.imagem_d4 || p.imagem_d5 || p.imagem_d6 || p.imagem_d7}
+                        src={p.imagem_d1}
                         alt={p.nome}
-                        style={{ width: "100%", height: 150, objectFit: "cover", marginBottom: 10 }}
+                        style={{
+                          width: "100%",
+                          height: 150,
+                          objectFit: "cover",
+                          marginBottom: 10,
+                        }}
                       />
                       <h4>{p.nome}</h4>
                       <p style={{ fontSize: 13, color: "#666" }}>Ref: {p.referencia}</p>
@@ -277,56 +282,6 @@ function App() {
           ))}
         </main>
       </div>
-
-      {modalProduto && (
-        <div style={modalOverlayStyle}>
-          <div style={modalContentStyle}>
-            <button onClick={fecharModal} style={modalCloseStyle}>✖</button>
-            <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row" }}>
-              <div style={{ flex: 1, padding: 10 }}>
-                <img
-                  src={modalProduto[`imagem_d${imagemAtiva + 1}`]}
-                  alt={modalProduto.nome}
-                  style={{ width: "100%", height: 300, objectFit: "contain", marginBottom: 10 }}
-                />
-                <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-                  {[1, 2, 3, 4, 5, 6, 7].map((n, i) => {
-                    const img = modalProduto[`imagem_d${n}`];
-                    if (!img) return null;
-                    return (
-                      <img
-                        key={i}
-                        src={img}
-                        alt={`mini-${n}`}
-                        style={{
-                          width: 60,
-                          height: 60,
-                          objectFit: "cover",
-                          border: i === imagemAtiva ? "2px solid #f57c00" : "1px solid #ccc",
-                          borderRadius: 6,
-                          cursor: "pointer",
-                        }}
-                        onClick={() => setImagemAtiva(i)}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
-              <div style={{ flex: 1, padding: 10 }}>
-                <h2>{modalProduto.nome}</h2>
-                <p style={{ fontStyle: "italic", marginBottom: 8 }}>Ref: {modalProduto.referencia}</p>
-                <p>{modalProduto.descricao}</p>
-                {modalProduto.medidas && (
-                  <>
-                    <h4 style={{ marginTop: 20 }}>Medidas</h4>
-                    <p>{modalProduto.medidas}</p>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {mostrarTopo && (
         <button
