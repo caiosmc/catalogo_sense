@@ -6,29 +6,34 @@ function App() {
   const [erro, setErro] = useState(null);
 
   useEffect(() => {
-    const carregarProdutos = async () => {
-      console.log("Fazendo requisição para o Supabase...");
-      const { data, error } = await supabase
-        .from("tbl_produtos_xbz")
-        .select("*");
+    console.log("🔄 Iniciando fetch de produtos");
+
+    async function fetchProdutos() {
+      const { data, error } = await supabase.from("tbl_produtos_xbz").select("*");
 
       if (error) {
-        console.error("Erro ao buscar dados:", error);
-        setErro(error.message);
+        console.error("❌ Erro ao buscar produtos:", error);
+        setErro("Erro ao buscar produtos");
       } else {
-        console.log("Dados recebidos:", data);
+        console.log("✅ Produtos recebidos:", data);
         setProdutos(data);
       }
-    };
+    }
 
-    carregarProdutos();
+    fetchProdutos();
   }, []);
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>Teste de Conexão com Supabase</h1>
+    <div style={{ padding: 20, fontFamily: "sans-serif" }}>
+      <h1>Catálogo Supabase</h1>
+
       {erro && <p style={{ color: "red" }}>Erro: {erro}</p>}
-      <pre>{JSON.stringify(produtos, null, 2)}</pre>
+      {!erro && produtos.length === 0 && <p>🔄 Carregando produtos...</p>}
+      {!erro && produtos.length > 0 && (
+        <pre style={{ background: "#f4f4f4", padding: 10, borderRadius: 4 }}>
+          {JSON.stringify(produtos, null, 2)}
+        </pre>
+      )}
     </div>
   );
 }
