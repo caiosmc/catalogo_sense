@@ -17,25 +17,24 @@ function App() {
   const [mostrarCategoriasMobile, setMostrarCategoriasMobile] = useState(false);
 
   useEffect(() => {
-    const fetchProdutos = async () => {
-      console.log("🔄 Iniciando fetch de produtos");
+    const carregarProdutos = async () => {
       const { data, error } = await supabase
-        .from("tbl_produtos_xbz")
+        .from("tabela_produtos_xbz")
         .select("*")
+        .range(0, 9999)
         .order("categoria", { ascending: true })
         .order("subcategoria", { ascending: true })
-        .order("nome", { ascending: true })
-        .limit(10000);
+        .order("nome", { ascending: true });
 
       if (error) {
-        console.error("❌ Erro ao buscar produtos:", error.message);
+        console.error("Erro ao buscar dados do Supabase:", error);
       } else {
-        console.log("✅ Produtos recebidos:", data.length);
-        setProdutos(data);
+        const produtosFiltrados = data.filter((p) => p.categoria !== null);
+        setProdutos(produtosFiltrados);
       }
     };
 
-    fetchProdutos();
+    carregarProdutos();
 
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
@@ -50,15 +49,24 @@ function App() {
     setFiltro(buscaDaURL);
   }, []);
 
-  useEffect(() => atualizarURLComCategorias(categoriasSelecionadas), [categoriasSelecionadas]);
-  useEffect(() => atualizarURLComBusca(filtro), [filtro]);
+  useEffect(() => {
+    atualizarURLComCategorias(categoriasSelecionadas);
+  }, [categoriasSelecionadas]);
+
+  useEffect(() => {
+    atualizarURLComBusca(filtro);
+  }, [filtro]);
 
   const categorias = [...new Set(produtos.map((p) => p.categoria))];
 
   const toggleCategoria = (cat) => {
-    setCategoriasSelecionadas((prev) =>
-      cat === "__all__" ? [] : prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
-    );
+    if (cat === "__all__") {
+      setCategoriasSelecionadas([]);
+    } else {
+      setCategoriasSelecionadas((prev) =>
+        prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
+      );
+    }
   };
 
   const limparCategorias = () => {
@@ -67,9 +75,10 @@ function App() {
   };
 
   const produtosFiltrados = produtos.filter((p) => {
-    const matchNome = p.nome.toLowerCase().includes(filtro.toLowerCase());
+    const matchNome = p.nome?.toLowerCase().includes(filtro.toLowerCase());
     const matchCategoria =
-      categoriasSelecionadas.length === 0 || categoriasSelecionadas.includes(p.categoria);
+      categoriasSelecionadas.length === 0 ||
+      categoriasSelecionadas.includes(p.categoria);
     return matchNome && matchCategoria;
   });
 
@@ -82,7 +91,9 @@ function App() {
     setImagemAtiva(0);
   };
 
-  const fecharModal = () => setModalProduto(null);
+  const fecharModal = () => {
+    setModalProduto(null);
+  };
 
   return (
     <div style={{ fontFamily: "Arial, sans-serif", color: "#333" }}>
@@ -98,7 +109,9 @@ function App() {
         {!isMobile && (
           <aside style={{ width: 220, padding: 20 }}>
             <h3 style={{ marginBottom: 10 }}>Categorias</h3>
-            <button onClick={limparCategorias} style={buttonStyle}>Limpar filtros</button>
+            <button onClick={limparCategorias} style={buttonStyle}>
+              Limpar filtros
+            </button>
             <ul style={{ listStyle: "none", padding: 0, fontSize: 14 }}>
               <li>
                 <label>
@@ -134,8 +147,11 @@ function App() {
               <button onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)} style={buttonStyle}>
                 {mostrarCategoriasMobile ? "Ocultar categorias" : "Mostrar categorias"}
               </button>
+              <button onClick={limparCategorias} style={{ ...buttonStyle, marginLeft: 10 }}>
+                Limpar filtros
+              </button>
               {mostrarCategoriasMobile && (
-                <ul style={{ listStyle: "none", padding: 0, marginTop: 10 }}>
+                <ul style={{ listStyle: "none", padding: 0, marginTop: 10, fontSize: 14 }}>
                   <li>
                     <label>
                       <input
