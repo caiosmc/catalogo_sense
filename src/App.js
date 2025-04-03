@@ -109,11 +109,23 @@ function App() {
     setModalProduto(null);
   };
 
+  const obterImagemPrincipal = (produto) => {
+    return (
+      produto.imagem ||
+      produto.imagem_d1 ||
+      produto.imagem_d2 ||
+      produto.imagem_d3 ||
+      produto.imagem_d4 ||
+      produto.imagem_d5 ||
+      ""
+    );
+  };
+
   return (
     <div style={{ fontFamily: "Arial, sans-serif", color: "#333" }}>
       <div style={{ display: "flex", alignItems: "center", padding: 20 }}>
-        <img src="/logo-rg.png" alt="Logo" style={{ width: 120, marginRight: 20 }} />
-        <h1 style={{ fontSize: 35 }}>
+        <img src="/logo-rg.png" alt="Logo" style={{ width: 100, marginRight: 10 }} />
+        <h1 style={{ fontSize: 40 }}>
           <span style={{ color: "#4d4d4d" }}>Catálogo </span>
           <span style={{ color: "#f57c00" }}>Sense</span>
         </h1>
@@ -234,7 +246,7 @@ function App() {
                       onClick={() => abrirModal(p)}
                     >
                       <img
-                        src={p.imagem_d1}
+                        src={obterImagemPrincipal(p)}
                         alt={p.nome}
                         style={{ width: "100%", height: 150, objectFit: "cover", marginBottom: 10 }}
                       />
@@ -255,7 +267,7 @@ function App() {
             <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row" }}>
               <div style={{ flex: 1, padding: 10 }}>
                 <img
-                  src={modalProduto[`imagem_d${imagemAtiva + 1}`]}
+                  src={modalProduto[`imagem_d${imagemAtiva + 1}`] || modalProduto.imagem}
                   alt={modalProduto.nome}
                   style={{ width: "100%", height: 300, objectFit: "contain", marginBottom: 10 }}
                 />
