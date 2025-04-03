@@ -1,16 +1,12 @@
+// App.js atualizado para integrar com Supabase (substitui fetch por API Supabase)
 import React, { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "./supabase";
 import {
   obterCategoriasDaURL,
   atualizarURLComCategorias,
   obterTermoBuscaDaURL,
   atualizarURLComBusca,
 } from "./utils/urlFiltros";
-
-const supabase = createClient(
-  process.env.REACT_APP_SUPABASE_URL,
-  process.env.REACT_APP_SUPABASE_ANON_KEY
-);
 
 function App() {
   const [produtos, setProdutos] = useState([]);
@@ -20,31 +16,24 @@ function App() {
   const [modalProduto, setModalProduto] = useState(null);
   const [imagemAtiva, setImagemAtiva] = useState(0);
   const [mostrarCategoriasMobile, setMostrarCategoriasMobile] = useState(false);
-  const [mostrarTopo, setMostrarTopo] = useState(false);
 
   useEffect(() => {
-    const carregarProdutos = async () => {
-      const { data, error } = await supabase.from("tabela_produtos_xbz").select("*");
-      if (error) {
-        console.error("Erro ao carregar produtos:", error);
-      } else {
+    const fetchProdutos = async () => {
+      try {
+        const { data, error } = await supabase.from("tbl_produtos_xbz").select("*");
+        if (error) throw error;
         setProdutos(data);
+      } catch (err) {
+        console.error("Erro ao carregar produtos do Supabase:", err.message);
       }
     };
 
-    carregarProdutos();
+    fetchProdutos();
 
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
     window.addEventListener("resize", checkMobile);
-
-    const aoRolar = () => setMostrarTopo(window.scrollY > 200);
-    window.addEventListener("scroll", aoRolar);
-
-    return () => {
-      window.removeEventListener("resize", checkMobile);
-      window.removeEventListener("scroll", aoRolar);
-    };
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   useEffect(() => {
@@ -79,12 +68,8 @@ function App() {
     setFiltro("");
   };
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
   const produtosFiltrados = produtos.filter((p) => {
-    const matchNome = p.nome?.toLowerCase().includes(filtro.toLowerCase());
+    const matchNome = p.nome.toLowerCase().includes(filtro.toLowerCase());
     const matchCategoria =
       categoriasSelecionadas.length === 0 ||
       categoriasSelecionadas.includes(p.categoria);
@@ -106,7 +91,7 @@ function App() {
 
   return (
     <div style={{ fontFamily: "Arial, sans-serif", color: "#333" }}>
-      {/* ...restante do código permanece inalterado... */}
+      {/* Restante do JSX permanece igual ao original */}
     </div>
   );
 }
