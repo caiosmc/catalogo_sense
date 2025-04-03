@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+""import React, { useEffect, useState } from "react";
 import {
   obterCategoriasDaURL,
   atualizarURLComCategorias,
@@ -15,7 +15,7 @@ function App() {
   const [modalProduto, setModalProduto] = useState(null);
   const [imagemAtiva, setImagemAtiva] = useState(0);
   const [mostrarCategoriasMobile, setMostrarCategoriasMobile] = useState(false);
-  const [mostrarTopo, setMostrarTopo] = useState(false);
+  const [mostrarVoltarTopo, setMostrarVoltarTopo] = useState(false);
 
   useEffect(() => {
     async function fetchProdutosPaginado() {
@@ -54,13 +54,7 @@ function App() {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
     window.addEventListener("resize", checkMobile);
-    window.addEventListener("scroll", () => {
-      setMostrarTopo(window.scrollY > 300);
-    });
-    return () => {
-      window.removeEventListener("resize", checkMobile);
-      window.removeEventListener("scroll", () => {});
-    };
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   useEffect(() => {
@@ -77,6 +71,14 @@ function App() {
   useEffect(() => {
     atualizarURLComBusca(filtro);
   }, [filtro]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setMostrarVoltarTopo(window.scrollY > 600);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const categorias = [...new Set(produtos.map((p) => p.categoria))];
 
@@ -116,8 +118,18 @@ function App() {
     setModalProduto(null);
   };
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  const obterImagemValida = (produto) => {
+    return (
+      produto.imagem ||
+      produto.imagem_d1 ||
+      produto.imagem_d2 ||
+      produto.imagem_d3 ||
+      produto.imagem_d4 ||
+      produto.imagem_d5 ||
+      produto.imagem_d6 ||
+      produto.imagem_d7 ||
+      "https://via.placeholder.com/300x300.png?text=Sem+Imagem"
+    );
   };
 
   return (
@@ -127,11 +139,17 @@ function App() {
           src="/logo-rg.png"
           alt="Logo"
           style={{
-            width: isMobile ? 70 : 105,
+            width: isMobile ? 80 : 105,
             marginRight: 10,
+            transition: "all 0.3s ease",
           }}
         />
-        <h1 style={{ fontSize: isMobile ? 27 : 45 }}>
+        <h1
+          style={{
+            fontSize: isMobile ? 24 : 48,
+            transition: "all 0.3s ease",
+          }}
+        >
           <span style={{ color: "#4d4d4d" }}>Catálogo </span>
           <span style={{ color: "#f57c00" }}>Sense</span>
         </h1>
@@ -176,15 +194,17 @@ function App() {
         <main style={{ flex: 1, padding: 20 }}>
           {isMobile && (
             <div style={{ marginBottom: 20 }}>
-              <button
-                onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)}
-                style={buttonStyle}
-              >
-                {mostrarCategoriasMobile ? "Ocultar categorias" : "Mostrar categorias"}
-              </button>
-              <button onClick={limparCategorias} style={{ ...buttonStyle, marginLeft: 10 }}>
-                Limpar filtros
-              </button>
+              <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                <button
+                  onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)}
+                  style={buttonStyle}
+                >
+                  {mostrarCategoriasMobile ? "Ocultar categorias" : "Mostrar categorias"}
+                </button>
+                <button onClick={limparCategorias} style={buttonStyle}>
+                  Limpar filtros
+                </button>
+              </div>
               {mostrarCategoriasMobile && (
                 <ul style={{ listStyle: "none", padding: 0, marginTop: 10, fontSize: 12 }}>
                   <li>
@@ -239,108 +259,59 @@ function App() {
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(auto-fill, minmax(200px, 1fr))",
+                  gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(auto-fill, minmax(180px, 1fr))",
                   gap: 20,
                 }}
               >
                 {produtosFiltrados
                   .filter((p) => p.categoria === cat)
-                  .map((p, index) => {
-                    const imagemSrc =
-                      p.imagem || p.imagem_d1 || p.imagem_d2 || p.imagem_d3 || p.imagem_d4 || p.imagem_d5 || p.imagem_d6 || p.imagem_d7;
-                    return (
-                      <div
-                        key={index}
-                        style={{
-                          border: "1px solid #ccc",
-                          padding: 10,
-                          borderRadius: 8,
-                          backgroundColor: "#fff",
-                          cursor: "pointer",
-                        }}
-                        onClick={() => abrirModal(p)}
-                      >
-                        <img
-                          src={imagemSrc}
-                          alt={p.nome}
-                          style={{ width: "100%", height: 300, objectFit: "cover", marginBottom: 10 }}
-                        />
-                        <h4>{p.nome}</h4>
-                        <p style={{ fontSize: 13, color: "#666" }}>Ref: {p.referencia}</p>
-                      </div>
-                    );
-                  })}
+                  .map((p, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        border: "1px solid #ccc",
+                        padding: 10,
+                        borderRadius: 8,
+                        backgroundColor: "#fff",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => abrirModal(p)}
+                    >
+                      <img
+                        src={obterImagemValida(p)}
+                        alt={p.nome}
+                        style={{ width: "100%", height: 140, objectFit: "cover", marginBottom: 10 }}
+                      />
+                      <h4>{p.nome}</h4>
+                      <p style={{ fontSize: 13, color: "#666" }}>Ref: {p.referencia}</p>
+                    </div>
+                  ))}
               </div>
             </div>
           ))}
         </main>
       </div>
 
-      {modalProduto && (
-        <div style={modalOverlayStyle}>
-          <div style={modalContentStyle}>
-            <button onClick={fecharModal} style={modalCloseStyle}>✖</button>
-            <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row" }}>
-              <div style={{ flex: 1, padding: 10 }}>
-                <img
-                  src={modalProduto[`imagem_d${imagemAtiva + 1}`]}
-                  alt={modalProduto.nome}
-                  style={{ width: "100%", height: 300, objectFit: "contain", marginBottom: 10 }}
-                />
-                <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-                  {[1, 2, 3, 4, 5].map((n, i) => {
-                    const img = modalProduto[`imagem_d${n}`];
-                    if (!img) return null;
-                    return (
-                      <img
-                        key={i}
-                        src={img}
-                        alt={`mini-${n}`}
-                        style={{
-                          width: 60,
-                          height: 60,
-                          objectFit: "cover",
-                          border: i === imagemAtiva ? "2px solid #f57c00" : "1px solid #ccc",
-                          borderRadius: 6,
-                          cursor: "pointer",
-                        }}
-                        onClick={() => setImagemAtiva(i)}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
-              <div style={{ flex: 1, padding: 10 }}>
-                <h2>{modalProduto.nome}</h2>
-                <p style={{ fontStyle: "italic", marginBottom: 8 }}>Ref: {modalProduto.referencia}</p>
-                <p>{modalProduto.descricao}</p>
-                {modalProduto.medidas && (
-                  <>
-                    <h4 style={{ marginTop: 20 }}>Medidas</h4>
-                    <p>{modalProduto.medidas}</p>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {mostrarTopo && (
+      {mostrarVoltarTopo && (
         <button
-          onClick={scrollToTop}
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           style={{
             position: "fixed",
             bottom: 20,
             right: 20,
-            background: "#f57c00",
+            backgroundColor: "#f57c00",
             color: "white",
             border: "none",
-            padding: 10,
             borderRadius: "50%",
-            fontSize: 20,
+            width: 50,
+            height: 50,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 24,
+            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
             cursor: "pointer",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
+            zIndex: 999,
           }}
         >
           ↑
@@ -357,40 +328,6 @@ const buttonStyle = {
   padding: "8px 12px",
   borderRadius: 6,
   marginBottom: 12,
-  cursor: "pointer",
-};
-
-const modalOverlayStyle = {
-  position: "fixed",
-  top: 0,
-  left: 0,
-  width: "100vw",
-  height: "100vh",
-  backgroundColor: "rgba(0,0,0,0.5)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  zIndex: 1000,
-};
-
-const modalContentStyle = {
-  backgroundColor: "white",
-  padding: 20,
-  maxWidth: 900,
-  width: "90%",
-  maxHeight: "90vh",
-  overflowY: "auto",
-  position: "relative",
-  borderRadius: 10,
-};
-
-const modalCloseStyle = {
-  position: "absolute",
-  top: 10,
-  right: 10,
-  background: "none",
-  border: "none",
-  fontSize: 24,
   cursor: "pointer",
 };
 
