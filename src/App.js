@@ -5,6 +5,7 @@ import {
   obterTermoBuscaDaURL,
   atualizarURLComBusca,
 } from "./utils/urlFiltros";
+import { supabase } from "./supabase";
 
 function App() {
   const [produtos, setProdutos] = useState([]);
@@ -14,16 +15,48 @@ function App() {
   const [modalProduto, setModalProduto] = useState(null);
   const [imagemAtiva, setImagemAtiva] = useState(0);
   const [mostrarCategoriasMobile, setMostrarCategoriasMobile] = useState(false);
+  const [mostrarTopo, setMostrarTopo] = useState(false);
 
   useEffect(() => {
-    fetch("/produtos.json")
-      .then((res) => res.json())
-      .then((data) => setProdutos(data))
-      .catch((err) => console.error("Erro ao carregar produtos:", err));
+    async function fetchProdutosPaginado() {
+      console.log("Iniciando fetch de produtos...");
+      let todosProdutos = [];
+      let pagina = 0;
+      const tamanhoPagina = 1000;
+
+      while (true) {
+        const { data, error } = await supabase
+          .from("tbl_produtos_xbz")
+          .select("*")
+          .order("categoria", { ascending: true })
+          .order("subcategoria", { ascending: true })
+          .order("nome", { ascending: true })
+          .range(pagina * tamanhoPagina, (pagina + 1) * tamanhoPagina - 1);
+
+        if (error) {
+          console.error("Erro ao buscar dados do Supabase:", error);
+          break;
+        }
+
+        if (!data || data.length === 0) break;
+
+        todosProdutos = todosProdutos.concat(data);
+        if (data.length < tamanhoPagina) break;
+        pagina++;
+      }
+
+      console.log("Produtos recebidos:", todosProdutos.length);
+      setProdutos(todosProdutos);
+    }
+
+    fetchProdutosPaginado();
 
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
     window.addEventListener("resize", checkMobile);
+    window.addEventListener("scroll", () => {
+      setMostrarTopo(window.scrollY > window.innerHeight * 2);
+    });
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
@@ -60,7 +93,7 @@ function App() {
   };
 
   const produtosFiltrados = produtos.filter((p) => {
-    const matchNome = p.nome.toLowerCase().includes(filtro.toLowerCase());
+    const matchNome = p.nome?.toLowerCase().includes(filtro.toLowerCase());
     const matchCategoria =
       categoriasSelecionadas.length === 0 ||
       categoriasSelecionadas.includes(p.categoria);
@@ -80,16 +113,32 @@ function App() {
     setModalProduto(null);
   };
 
+  const primeiraImagemValida = (p) => {
+    return (
+      p.imagem ||
+      p.imagem_d1 ||
+      p.imagem_d2 ||
+      p.imagem_d3 ||
+      p.imagem_d4 ||
+      p.imagem_d5 ||
+      p.imagem_d6 ||
+      "https://via.placeholder.com/150"
+    );
+  };
+
   return (
     <div style={{ fontFamily: "Arial, sans-serif", color: "#333" }}>
       <div style={{ display: "flex", alignItems: "center", padding: 20 }}>
-        <img src="/logo-rg.png" alt="Logo" style={{ width: 50, marginRight: 10 }} />
-        <h1 style={{ fontSize: 30 }}>
+        <img
+          src="/logo-rg.png"
+          alt="Logo"
+          style={{ width: isMobile ? 70 : 120, marginRight: 10 }}
+        />
+        <h1 style={{ fontSize: isMobile ? 24 : 44 }}>
           <span style={{ color: "#4d4d4d" }}>Catálogo </span>
           <span style={{ color: "#f57c00" }}>Sense</span>
         </h1>
       </div>
-
       <div style={{ display: "flex" }}>
         {!isMobile && (
           <aside style={{ width: 220, padding: 20 }}>
@@ -97,7 +146,7 @@ function App() {
             <button onClick={limparCategorias} style={buttonStyle}>
               Limpar filtros
             </button>
-            <ul style={{ listStyle: "none", padding: 0, fontSize: 14 }}>
+            <ul style={{ listStyle: "none", padding: 0, fontSize: 13 }}>
               <li>
                 <label>
                   <input
@@ -129,11 +178,20 @@ function App() {
         <main style={{ flex: 1, padding: 20 }}>
           {isMobile && (
             <div style={{ marginBottom: 20 }}>
-              <button onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)} style={buttonStyle}>
+              <button
+                onClick={() => setMostrarCategoriasMobile(!mostrarCategoriasMobile)}
+                style={buttonStyle}
+              >
                 {mostrarCategoriasMobile ? "Ocultar categorias" : "Mostrar categorias"}
               </button>
+              <button
+                onClick={limparCategorias}
+                style={{ ...buttonStyle, marginLeft: 10 }}
+              >
+                Limpar filtros
+              </button>
               {mostrarCategoriasMobile && (
-                <ul style={{ listStyle: "none", padding: 0, marginTop: 10 }}>
+                <ul style={{ listStyle: "none", padding: 0, marginTop: 10, fontSize: 13 }}>
                   <li>
                     <label>
                       <input
@@ -166,7 +224,7 @@ function App() {
           <input
             placeholder="Buscar por nome do produto..."
             style={{
-              width: "100%",
+              width: isMobile ? "90%" : "100%",
               maxWidth: 400,
               padding: 10,
               borderRadius: 6,
@@ -205,11 +263,11 @@ function App() {
                       onClick={() => abrirModal(p)}
                     >
                       <img
-                        src={p.imagem_d1}
+                        src={primeiraImagemValida(p)}
                         alt={p.nome}
-                        style={{ width: "100%", height: 150, objectFit: "cover", marginBottom: 10 }}
+                        style={{ width: "100%", height: 200, objectFit: "cover", marginBottom: 10 }}
                       />
-                      <h4 onClick={() => abrirModal(p)}>{p.nome}</h4>
+                      <h4>{p.nome}</h4>
                       <p style={{ fontSize: 13, color: "#666" }}>Ref: {p.referencia}</p>
                     </div>
                   ))}
@@ -226,12 +284,12 @@ function App() {
             <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row" }}>
               <div style={{ flex: 1, padding: 10 }}>
                 <img
-                  src={modalProduto[`imagem_d${imagemAtiva + 1}`]}
+                  src={modalProduto[`imagem_d${imagemAtiva + 1}`] || primeiraImagemValida(modalProduto)}
                   alt={modalProduto.nome}
                   style={{ width: "100%", height: 300, objectFit: "contain", marginBottom: 10 }}
                 />
                 <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-                  {[1, 2, 3, 4, 5].map((n, i) => {
+                  {[1, 2, 3, 4, 5, 6].map((n, i) => {
                     const img = modalProduto[`imagem_d${n}`];
                     if (!img) return null;
                     return (
@@ -267,6 +325,28 @@ function App() {
             </div>
           </div>
         </div>
+      )}
+
+      {mostrarTopo && (
+        <button
+          style={{
+            position: "fixed",
+            bottom: 20,
+            right: 20,
+            backgroundColor: "#f57c00",
+            color: "white",
+            border: "none",
+            borderRadius: "50%",
+            width: 48,
+            height: 48,
+            fontSize: 24,
+            cursor: "pointer",
+            zIndex: 1000,
+          }}
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        >
+          ↑
+        </button>
       )}
     </div>
   );
