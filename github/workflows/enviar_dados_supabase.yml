@@ -28,4 +28,4 @@ jobs:
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         run: node src/api/produtos.js
 
-        # forçar execução e indexação
+# trigger GitHub Actions
