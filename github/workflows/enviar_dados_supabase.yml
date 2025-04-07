@@ -1,0 +1,27 @@
+name: Enviar dados ao Supabase
+
+on:
+  schedule:
+    - cron: '0 6 * * *' # roda todos os dias às 06:00 UTC (03:00 BRT)
+  workflow_dispatch:
+
+jobs:
+  rodar-script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repositório
+        uses: actions/checkout@v3
+
+      - name: Configurar ambiente Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Executar script de envio de produtos
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: node src/api/produtos.js
